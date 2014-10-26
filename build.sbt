@@ -12,4 +12,6 @@ libraryDependencies += "net.databinder.dispatch" %% "dispatch-core" % "0.11.2"
 
 libraryDependencies += "org.scalatest" % "scalatest_2.10" % "2.0" % "test"
 
+libraryDependencies += "com.amazonaws" % "aws-java-sdk" % "1.9.3"
+
 scalacOptions += "-feature"

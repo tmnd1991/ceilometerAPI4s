@@ -235,6 +235,5 @@ class JsonTests extends FlatSpec with Matchers {
                          |    "limit": 42,
                          |    "orderby": "[{\"counter_volume\": \"ASC\"}, {\"timestamp\": \"DESC\"}]"
                          |}""".stripMargin.parseJson.convertTo[ComplexQuery]
-    println(complexQuery.filter)
   }
 }

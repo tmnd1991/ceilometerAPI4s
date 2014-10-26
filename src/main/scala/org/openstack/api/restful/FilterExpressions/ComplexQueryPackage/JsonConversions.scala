@@ -50,7 +50,7 @@ object JsonConversions extends DefaultJsonProtocol{
   }
 */
   implicit object FilterJsonFormat extends JsonFormat[Filter] {
-    override def write(f : Filter) =  JsString(ExpressionJsonFormat.write(f.e).toString)
+    override def write(f : Filter) =  ExpressionJsonFormat.write(f.e)
 
     override def read(json: JsValue) = {
       val s = json.asInstanceOf[JsString].value
@@ -89,7 +89,6 @@ object JsonConversions extends DefaultJsonProtocol{
 
     override def read(json: JsValue) = json match{
       case obj : JsObject =>{
-        val orderby = List(OrderBy("ciccio",Order.ASC))
         obj.fields.size match{
           case 1 => ComplexQuery(FilterJsonFormat.read(obj.fields.getOrElse("filter",throw new MalformedJsonException)))
           case 2 => if(obj.fields.contains("limit")){
@@ -97,14 +96,14 @@ object JsonConversions extends DefaultJsonProtocol{
                       Some(obj.fields("limit").convertTo[Int]))
                     }
                     else {
-                      //val orderby = obj.fields("orderby").convertTo[Seq[OrderBy]]
+                      val orderbyJs = obj.fields("orderby").asInstanceOf[JsString].value
+                      val orderby = orderbyJs.parseJson.convertTo[Seq[OrderBy]]
                       ComplexQuery(FilterJsonFormat.read(obj.fields.getOrElse("filter",throw new MalformedJsonException)),
                       None, Some(orderby))
                     }
           case 3 => {
-            //val orderby = obj.fields("orderby").convertTo[Seq[OrderBy]]
-            val orderbys = obj.fields("orderby").convertTo[String]
-
+            val orderbyJs = obj.fields("orderby").asInstanceOf[JsString].value
+            val orderby = orderbyJs.parseJson.convertTo[Seq[OrderBy]]
             ComplexQuery(FilterJsonFormat.read(obj.fields.getOrElse("filter",throw new MalformedJsonException)),
             Some(obj.fields("limit").convertTo[Int]), Some(orderby))
           }
