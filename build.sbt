@@ -14,4 +14,6 @@ libraryDependencies += "org.scalatest" % "scalatest_2.10" % "2.0" % "test"
 
 libraryDependencies += "com.amazonaws" % "aws-java-sdk" % "1.9.3"
 
+libraryDependencies += "org.fusesource" % "sigar" % "1.6.4"
+
 scalacOptions += "-feature"
