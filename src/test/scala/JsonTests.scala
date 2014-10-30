@@ -221,12 +221,13 @@ class JsonTests extends FlatSpec with Matchers {
   }
 
   "Query" should "be mapped correctly" in{
-    val simpleQuery = """{
+    import DefaultJsonProtocol._
+    val simpleQuery = """[{
                         |    "field": "resource_id",
                         |    "op": "eq",
                         |    "type": "string",
                         |    "value": "bd9431c1-8d69-4ad3-803a-8d4a6b89fd36"
-                        |}""".stripMargin.parseJson.convertTo[SimpleQuery]
+                        |}]""".stripMargin.parseJson.convertTo[List[SimpleQuery]]
   }
 
   "ComplexQuery" should "be mapped correctly" in{

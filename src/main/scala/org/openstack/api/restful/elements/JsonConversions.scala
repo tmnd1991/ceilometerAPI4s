@@ -32,6 +32,6 @@ object JsonConversions extends DefaultJsonProtocol{
       }
     }
 
-    implicit val linkJsonFormat = jsonFormat(Link,"href","rel","type")
-    implicit val versionJsonFormat = jsonFormat(Version,"status","updated","id", "links")
+    implicit val linkJsonFormat = jsonFormat3(Link)
+    implicit val versionJsonFormat = jsonFormat4(Version)
 }

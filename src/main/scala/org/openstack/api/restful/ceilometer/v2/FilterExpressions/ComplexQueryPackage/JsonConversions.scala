@@ -3,7 +3,6 @@ package org.openstack.api.restful.FilterExpressions.ComplexQueryPackage
 import myUtils.{TypeExtractor, DateUtils}
 import org.openstack.api.restful.FilterExpressions._
 import org.openstack.api.restful.FilterExpressions.JsonConversions._
-import org.openstack.api.restful.FilterExpressions.SimpleQueryPackage.SimpleQuery
 import org.openstack.api.restful.MalformedJsonException
 import spray.json.{DefaultJsonProtocol, JsObject, JsonWriter, _}
 
@@ -35,20 +34,6 @@ object JsonConversions extends DefaultJsonProtocol{
     override def write(obj: OrderBy) = JsObject(obj.field -> JsString(obj.order.s))
   }
 
-  /*
-  implicit object OrderByListJsonFormat extends JsonFormat[OrderByList]{
-    override def read(json: JsValue) = json match{
-      case array : JsArray =>{
-        OrderByList(array.elements.map(OrderByJsonFormat.read(_)))
-      }
-      case _ => throw new MalformedJsonException
-    }
-
-    override def write(obj: OrderByList) = {
-      JsArray(obj.list.map(OrderByJsonFormat.write(_)).toVector)
-    }
-  }
-*/
   implicit object FilterJsonFormat extends JsonFormat[Filter] {
     override def write(f : Filter) =  ExpressionJsonFormat.write(f.e)
 

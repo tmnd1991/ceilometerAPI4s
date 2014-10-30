@@ -9,6 +9,7 @@ import org.openstack.api.restful.ceilometer.v2.elements.{Statistics, Resource, M
  */
 
 object JsonConversions extends DefaultJsonProtocol{
+
   implicit object ResourceListJsonFormat extends JsonFormat[ResourceList] {
     def write(rl: ResourceList) =
       JsArray(rl.resources.map(_.toJson).toVector)

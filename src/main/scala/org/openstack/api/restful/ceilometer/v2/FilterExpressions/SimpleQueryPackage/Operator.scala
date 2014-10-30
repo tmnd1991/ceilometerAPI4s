@@ -3,9 +3,8 @@ package org.openstack.api.restful.FilterExpressions.SimpleQueryPackage
 /**
  * Created by tmnd on 19/10/14.
  */
-abstract class Operator(val s : String) {
+abstract class Operator(val s : String) extends Serializable
 
-}
 object Operator{
   object lt extends Operator("lt")
   object le extends Operator("le")

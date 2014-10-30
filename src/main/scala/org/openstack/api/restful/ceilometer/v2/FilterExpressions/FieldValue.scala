@@ -3,7 +3,7 @@ package org.openstack.api.restful.FilterExpressions
 /**
  * Created by tmnd on 19/10/14.
  */
-abstract class FieldValue(val getType : String){
+abstract class FieldValue(val getType : String) extends Serializable{
   val value : Any
   override def toString = value.toString
 }

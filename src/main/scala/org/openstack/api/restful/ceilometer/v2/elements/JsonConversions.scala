@@ -1,16 +1,18 @@
 package org.openstack.api.restful.ceilometer.v2.elements
 
-import java.sql.Timestamp
 
-import org.openstack.api.restful.MalformedJsonException
-import org.openstack.api.restful.FilterExpressions.SimpleQueryPackage.JsonConversions._
-import org.openstack.api.restful.FilterExpressions.JsonConversions._
-import spray.json._
 
 /**
  * Created by tmnd on 21/10/14.
  */
-object JsonConversions extends DefaultJsonProtocol{
+object JsonConversions extends spray.json.DefaultJsonProtocol{
+  import java.sql.Timestamp
+
+  import spray.json._
+  import DefaultJsonProtocol._
+  import org.openstack.api.restful.MalformedJsonException
+  import org.openstack.api.restful.FilterExpressions.SimpleQueryPackage.JsonConversions._
+  import org.openstack.api.restful.FilterExpressions.JsonConversions._
   import org.openstack.api.restful.elements.JsonConversions._
 
   implicit object MeterTypeJsonFormat extends JsonFormat[MeterType] {
@@ -22,6 +24,7 @@ object JsonConversions extends DefaultJsonProtocol{
       case _ => throw new MalformedJsonException
     }
   }
+
   implicit object TimestampJsonFormat extends JsonFormat[java.sql.Timestamp] {
     override def read(json: JsValue) = json match{
       case s : JsString => myUtils.TimestampUtils.parseOption(s.value) match{
@@ -33,30 +36,16 @@ object JsonConversions extends DefaultJsonProtocol{
 
     override def write(obj: Timestamp) =  JsString(myUtils.TimestampUtils.format(obj))
   }
-  implicit val ResourceJsonFormat = jsonFormat(Resource,"first_sample_timestamp",
-                                                        "last_sample_timestamp",
-                                                        "links",
-                                                        "metadata",
-                                                        "project_id",
-                                                        "resource_id",
-                                                        "source",
-                                                        "user_id"
-                                              )
-  implicit val MeterJsonFormat = jsonFormat(Meter,"meter_id",
-                                                  "name",
-                                                  "project_id",
-                                                  "resource_id",
-                                                  "source",
-                                                  "type",
-                                                  "unit",
-                                                  "user_id"
-                                            )
+
+  implicit val ResourceJsonFormat = jsonFormat8(Resource)
+
+  implicit val MeterJsonFormat = jsonFormat8(Meter)
 
   implicit val SampleJsonFormat = jsonFormat12(Sample)
 
   implicit val OldSampleJsonFormat = jsonFormat12(OldSample)
 
-  implicit val AggregateJsonFormat = jsonFormat(Aggregate,"func","param")
+  implicit val AggregateJsonFormat = jsonFormat2(Aggregate)
 
   implicit object StatisticsJsonFormat extends RootJsonFormat[Statistics]{
     override def read(json: JsValue) = json match{
@@ -159,9 +148,13 @@ object JsonConversions extends DefaultJsonProtocol{
 
     override def write(obj: StatisticType) = JsString(obj.s)
   }
+
   implicit val AlarmThresholdRuleJsonFormat = jsonFormat8(AlarmThresholdRule)
+
   implicit val AlarmCombinationRuleJsonFormat = jsonFormat2(AlarmCombinationRule)
+
   implicit val AlarmTimeConstraintJsonFormat = jsonFormat5(AlarmTimeConstraint)
+
   implicit object AlarmTypeJsonFormat extends JsonFormat[AlarmType]{
     override def read(json: JsValue): AlarmType = json match{
       case s : JsString => AlarmType.values.getOrElse(s.value, throw new MalformedJsonException)
@@ -170,7 +163,9 @@ object JsonConversions extends DefaultJsonProtocol{
 
     override def write(obj: AlarmType) = JsString(obj.s)
   }
+
   implicit val AlarmJsonFormat = jsonFormat17(Alarm)
+
   implicit object AlarmChangeTypeJsonFormat extends JsonFormat[AlarmChangeType]{
     override def read(json: JsValue) = json match{
       case s : JsString => AlarmChangeType.values.getOrElse(s.value, throw new MalformedJsonException)
@@ -179,5 +174,6 @@ object JsonConversions extends DefaultJsonProtocol{
 
     override def write(obj: AlarmChangeType) = JsString(obj.s)
   }
+
   implicit val AlarmChangeJsonFormat = jsonFormat8(AlarmChange)
 }

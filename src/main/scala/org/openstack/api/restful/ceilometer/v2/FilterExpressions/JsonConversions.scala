@@ -65,6 +65,7 @@ object JsonConversions extends json.DefaultJsonProtocol{
       case _ => throw new MalformedJsonException
     }
   }
+
   implicit object IntFieldJsonFormat extends JsonFormat[IntField] {
     override def write(i : IntField) = JsNumber(i.value)
     override def read(json: JsValue) = json match{
