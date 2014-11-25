@@ -39,7 +39,58 @@ object JsonConversions extends spray.json.DefaultJsonProtocol{
 
   implicit val ResourceJsonFormat = jsonFormat8(Resource)
 
-  implicit val MeterJsonFormat = jsonFormat8(Meter)
+  //implicit val MeterJsonFormat = jsonFormat8(Meter)
+  implicit object MeterJsonFormat extends RootJsonFormat[Meter]{
+    override def write(obj: Meter) = JsObject(
+      "meter_id" -> obj.meter_id.toJson,
+      "name" -> obj.name.toJson,
+      "project_id" -> {
+        if (obj.user_id == null) JsNull
+        else obj.user_id.toJson
+      },
+      "resource_id" -> obj.resource_id.toJson,
+      "source" -> obj.source.toJson,
+      "type" -> obj.`type`.toJson,
+      "unit" -> obj.unit.toJson,
+      "user_id" -> {
+        if (obj.user_id == null) JsNull
+        else obj.user_id.toJson
+      }
+    )
+
+    override def read(json: JsValue) = json match{
+      case obj : JsObject =>{
+        if (obj.fields.size == 8){
+          try{
+            Meter(obj.fields("meter_id").asInstanceOf[JsString].value,
+                  obj.fields("name").asInstanceOf[JsString].value,
+                  {
+                    if (obj.fields("project_id") == JsNull)
+                      null
+                    else
+                      obj.fields("project_id").asInstanceOf[JsString].value
+                  },
+                  obj.fields("resource_id").asInstanceOf[JsString].value,
+                  obj.fields("source").asInstanceOf[JsString].value,
+                  obj.fields("type").asInstanceOf[JsString].convertTo[MeterType],
+                  obj.fields("unit").asInstanceOf[JsString].value,
+                  {
+                    if (obj.fields("user_id") == JsNull)
+                      null
+                    else
+                      obj.fields("user_id").asInstanceOf[JsString].value
+                  })
+          }
+          catch{
+            case t : Throwable => throw new MalformedJsonException(t.getMessage)
+          }
+        }
+        else
+          throw new MalformedJsonException
+      }
+      case _ => throw new MalformedJsonException
+    }
+  }
 
   implicit val SampleJsonFormat = jsonFormat12(Sample)
 
