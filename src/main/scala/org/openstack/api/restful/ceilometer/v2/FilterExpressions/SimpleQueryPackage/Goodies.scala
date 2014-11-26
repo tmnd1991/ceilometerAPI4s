@@ -1,6 +1,6 @@
-package org.openstack.api.restful.FilterExpressions.SimpleQueryPackage
+package org.openstack.api.restful.ceilometer.v2.FilterExpressions.SimpleQueryPackage
 
-import org.openstack.api.restful.FilterExpressions._
+import org.openstack.api.restful.ceilometer.v2.FilterExpressions._
 
 /**
  * Created by tmnd on 21/10/14.

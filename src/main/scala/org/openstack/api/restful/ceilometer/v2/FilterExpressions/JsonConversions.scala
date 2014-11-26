@@ -1,10 +1,10 @@
-package org.openstack.api.restful.FilterExpressions
+package org.openstack.api.restful.ceilometer.v2.FilterExpressions
 
 import myUtils.DateUtils
-import org.openstack.api.restful.FilterExpressions.ComplexQueryPackage.ComplexQuery
-import org.openstack.api.restful.FilterExpressions.ComplexQueryPackage.JsonConversions.ComplexQueryJsonFormat
-import org.openstack.api.restful.FilterExpressions.SimpleQueryPackage.JsonConversions.SimpleQueryJsonFormat
-import org.openstack.api.restful.FilterExpressions.SimpleQueryPackage.SimpleQuery
+import org.openstack.api.restful.ceilometer.v2.FilterExpressions.ComplexQueryPackage.ComplexQuery
+import org.openstack.api.restful.ceilometer.v2.FilterExpressions.ComplexQueryPackage.JsonConversions.ComplexQueryJsonFormat
+import org.openstack.api.restful.ceilometer.v2.FilterExpressions.SimpleQueryPackage.JsonConversions.SimpleQueryJsonFormat
+import org.openstack.api.restful.ceilometer.v2.FilterExpressions.SimpleQueryPackage.SimpleQuery
 import org.openstack.api.restful.MalformedJsonException
 import spray.json
 import spray.json._

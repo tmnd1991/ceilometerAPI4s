@@ -1,4 +1,4 @@
-package org.openstack.api.restful.FilterExpressions
+package org.openstack.api.restful.ceilometer.v2.FilterExpressions
 
 /**
  * Created by tmnd on 19/10/14.

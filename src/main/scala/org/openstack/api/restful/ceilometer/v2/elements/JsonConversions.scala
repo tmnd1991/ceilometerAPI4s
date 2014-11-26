@@ -11,8 +11,8 @@ object JsonConversions extends spray.json.DefaultJsonProtocol{
   import spray.json._
   import DefaultJsonProtocol._
   import org.openstack.api.restful.MalformedJsonException
-  import org.openstack.api.restful.FilterExpressions.SimpleQueryPackage.JsonConversions._
-  import org.openstack.api.restful.FilterExpressions.JsonConversions._
+  import org.openstack.api.restful.ceilometer.v2.FilterExpressions.SimpleQueryPackage.JsonConversions._
+  import org.openstack.api.restful.ceilometer.v2.FilterExpressions.JsonConversions._
   import org.openstack.api.restful.elements.JsonConversions._
 
   implicit object MeterTypeJsonFormat extends JsonFormat[MeterType] {

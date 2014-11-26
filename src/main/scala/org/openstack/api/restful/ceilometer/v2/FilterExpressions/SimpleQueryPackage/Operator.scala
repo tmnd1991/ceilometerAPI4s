@@ -1,4 +1,4 @@
-package org.openstack.api.restful.FilterExpressions.SimpleQueryPackage
+package org.openstack.api.restful.ceilometer.v2.FilterExpressions.SimpleQueryPackage
 
 /**
  * Created by tmnd on 19/10/14.
@@ -15,8 +15,8 @@ object Operator{
 
   val values = Map("lt" -> lt,
   "le" -> le,
-  "eq" -> org.openstack.api.restful.FilterExpressions.SimpleQueryPackage.Operator.eq,
-  "ne" -> org.openstack.api.restful.FilterExpressions.SimpleQueryPackage.Operator.ne,
+  "eq" -> org.openstack.api.restful.ceilometer.v2.FilterExpressions.SimpleQueryPackage.Operator.eq,
+  "ne" -> org.openstack.api.restful.ceilometer.v2.FilterExpressions.SimpleQueryPackage.Operator.ne,
   "ge" -> ge,
   "gt" -> gt)
 }

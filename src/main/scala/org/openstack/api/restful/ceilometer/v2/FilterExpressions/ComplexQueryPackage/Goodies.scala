@@ -1,7 +1,7 @@
-package org.openstack.api.restful.FilterExpressions.ComplexQueryPackage
+package org.openstack.api.restful.ceilometer.v2.FilterExpressions.ComplexQueryPackage
 
 
-import org.openstack.api.restful.FilterExpressions._
+import org.openstack.api.restful.ceilometer.v2.FilterExpressions._
 /**
  * Created by tmnd on 19/10/14.
  */

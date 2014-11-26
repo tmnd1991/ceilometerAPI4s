@@ -2,8 +2,8 @@
  * Created by tmnd on 19/10/14.
  */
 
-import org.openstack.api.restful.FilterExpressions.ComplexQueryPackage.ComplexQuery
-import org.openstack.api.restful.FilterExpressions.SimpleQueryPackage.SimpleQuery
+import org.openstack.api.restful.ceilometer.v2.FilterExpressions.ComplexQueryPackage.ComplexQuery
+import org.openstack.api.restful.ceilometer.v2.FilterExpressions.SimpleQueryPackage.SimpleQuery
 import org.openstack.api.restful.keystone.v2.responses.TokenResponse
 import org.scalatest._
 
@@ -12,9 +12,9 @@ import spray.json._
 import org.openstack.api.restful.ceilometer.v2.elements._
 import org.openstack.api.restful.ceilometer.v2.elements.JsonConversions._
 import org.openstack.api.restful.keystone.v2.responses.JsonConversions._
-import org.openstack.api.restful.FilterExpressions.SimpleQueryPackage.JsonConversions._
-import org.openstack.api.restful.FilterExpressions.ComplexQueryPackage.JsonConversions._
-import org.openstack.api.restful.FilterExpressions.JsonConversions._
+import org.openstack.api.restful.ceilometer.v2.FilterExpressions.SimpleQueryPackage.JsonConversions._
+import org.openstack.api.restful.ceilometer.v2.FilterExpressions.ComplexQueryPackage.JsonConversions._
+import org.openstack.api.restful.ceilometer.v2.FilterExpressions.JsonConversions._
 
 class JsonTests extends FlatSpec with Matchers {
   "A Resource" should "be mapped correctly" in{

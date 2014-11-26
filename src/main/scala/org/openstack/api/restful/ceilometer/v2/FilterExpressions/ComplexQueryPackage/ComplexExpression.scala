@@ -1,4 +1,4 @@
-package org.openstack.api.restful.FilterExpressions.ComplexQueryPackage
+package org.openstack.api.restful.ceilometer.v2.FilterExpressions.ComplexQueryPackage
 
 /**
  * Created by tmnd on 18/10/14.

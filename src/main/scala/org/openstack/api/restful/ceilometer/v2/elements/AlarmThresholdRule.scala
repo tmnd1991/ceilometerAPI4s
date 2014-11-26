@@ -1,7 +1,7 @@
 package org.openstack.api.restful.ceilometer.v2.elements
 
-import org.openstack.api.restful.FilterExpressions.Query
-import org.openstack.api.restful.FilterExpressions.SimpleQueryPackage.Operator
+import org.openstack.api.restful.ceilometer.v2.FilterExpressions.Query
+import org.openstack.api.restful.ceilometer.v2.FilterExpressions.SimpleQueryPackage.Operator
 
 /**
  * Created by tmnd on 21/10/14.

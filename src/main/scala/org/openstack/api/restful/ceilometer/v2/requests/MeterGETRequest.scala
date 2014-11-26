@@ -1,7 +1,7 @@
 package org.openstack.api.restful.ceilometer.v2.requests
 
-import org.openstack.api.restful.FilterExpressions.Query
-import org.openstack.api.restful.FilterExpressions.JsonConversions._
+import org.openstack.api.restful.ceilometer.v2.FilterExpressions.Query
+import org.openstack.api.restful.ceilometer.v2.FilterExpressions.JsonConversions._
 import spray.json._
 
 /**
