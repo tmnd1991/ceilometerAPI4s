@@ -9,11 +9,10 @@ import java.util.Date
 import spray.json._
 
 /**
- * Created by tmnd on 20/10/14.
+ * @author Antonio Murgia
+ * @version 20/10/14
  */
 object JsonConversions extends DefaultJsonProtocol{
-
-
 
   implicit object OperatorJsonFormat extends JsonFormat[Operator] {
     override def write(obj: Operator) = JsString(obj.s)
@@ -27,12 +26,15 @@ object JsonConversions extends DefaultJsonProtocol{
   implicit object SimpleQueryJsonFormat extends JsonFormat[SimpleQuery] {
     override def read(json: JsValue): SimpleQuery = {
       json match {
-        case obj: JsObject => {
+        case obj: JsObject => try {
           val value: FieldValue = FieldValueJsonFormat.read(obj.fields("type"))
           val tipo = value.getType
           val op = obj.fields("op").convertTo[Operator]
           val field = obj.fields("field").convertTo[String]
           SimpleQuery(field, op, value, Some(tipo))
+        }
+        catch{
+          case t : Throwable => throw new MalformedJsonException
         }
         case _ => throw new MalformedJsonException
       }

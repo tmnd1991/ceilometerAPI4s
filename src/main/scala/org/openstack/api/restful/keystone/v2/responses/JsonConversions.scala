@@ -8,7 +8,7 @@ import org.openstack.api.restful.keystone.v2.elements.JsonConversions._
 import org.openstack.api.restful.MalformedJsonException
 
 /**
- * Created by tmnd on 09/11/14.
+ * @author Antonio Murgia
  */
 object JsonConversions extends DefaultJsonProtocol{
   implicit val TokenResponseJsonFormat = jsonFormat1(TokenResponse)

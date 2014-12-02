@@ -4,7 +4,9 @@ import org.openstack.api.restful.ceilometer.v2.FilterExpressions.Query
 import org.openstack.api.restful.ceilometer.v2.FilterExpressions.SimpleQueryPackage.Operator
 
 /**
- * Created by tmnd on 21/10/14.
+ * @author Antonio Murgia
+ * @version 22/10/14
+ * ceilometer AlarmThresholdRule representation
  */
 case class AlarmThresholdRule(comparison_operator : Operator,
                               evaluation_periods : Int,

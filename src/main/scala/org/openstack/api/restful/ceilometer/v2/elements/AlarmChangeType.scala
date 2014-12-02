@@ -1,14 +1,16 @@
 package org.openstack.api.restful.ceilometer.v2.elements
 
 /**
- * Created by tmnd on 21/10/14.
+ * @author Antonio Murgia
+ * @version 22/10/14
+ * ceilometer AlarmChangeType representation
  */
 class AlarmChangeType(val s : String)
 object AlarmChangeType{
-  val values = Map("creation" -> CREATION,
-                   "rule change" -> RULECHANGE,
-                   "state transition" -> STATETRANSITION,
-                   "deletion" -> DELETION)
+  val values = Map(CREATION.s -> CREATION,
+                   RULECHANGE.s -> RULECHANGE,
+                   STATETRANSITION.s -> STATETRANSITION,
+                   DELETION.s -> DELETION)
   object CREATION extends AlarmChangeType("creation")
   object RULECHANGE extends AlarmChangeType("rule change")
   object STATETRANSITION extends AlarmChangeType("state transition")

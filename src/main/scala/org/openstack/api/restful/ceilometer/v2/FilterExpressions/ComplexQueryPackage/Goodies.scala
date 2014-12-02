@@ -1,9 +1,11 @@
 package org.openstack.api.restful.ceilometer.v2.FilterExpressions.ComplexQueryPackage
 
-
+import scala.language.implicitConversions
 import org.openstack.api.restful.ceilometer.v2.FilterExpressions._
 /**
- * Created by tmnd on 19/10/14.
+ * @author Antonio Murgia
+ * @version 18/10/14
+ * shorthand syntax for creating expressions
  */
 object Goodies {
   def NOT(e : Expression) = UnaryComplexExpression(UnaryComplexOperator.NotOperator,e)
@@ -15,4 +17,5 @@ object Goodies {
     def LE(v : FieldValue) = SimpleExpression(SimpleOperator.LesserOrEqualsThan,s,v,v.getType)
     def NOTEQ(v : FieldValue) = SimpleExpression(SimpleOperator.NotEquals,s,v,v.getType)
   }
+  implicit def exp2filter(e : Expression) : Filter = Filter(e)
 }

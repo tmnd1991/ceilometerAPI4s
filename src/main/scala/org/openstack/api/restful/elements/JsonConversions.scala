@@ -8,19 +8,21 @@ import myUtils.DateUtils
 import myUtils.URLJsonConversion._
 import org.openstack.api.restful.MalformedJsonException
 /**
- * Created by tmnd on 11/10/14.
+ * @author Antonio Murgia
+ * @version 11/10/14
  */
 object JsonConversions extends DefaultJsonProtocol{
-    implicit object DateJsonFormat extends JsonFormat[Date] {
-      def write(d: Date) =
-        JsString(DateUtils.format(d))
-      def read(value: JsValue) = value match {
-        case JsString(date) =>
-          DateUtils.parse(date)
-        case _ => throw new MalformedJsonException
-      }
-    }
 
-    implicit val linkJsonFormat = jsonFormat3(Link)
-    implicit val versionJsonFormat = jsonFormat4(Version)
+  implicit object DateJsonFormat extends JsonFormat[Date] {
+    def write(d: Date) =
+      JsString(DateUtils.format(d))
+    def read(value: JsValue) = value match {
+      case JsString(date) =>
+        DateUtils.parse(date)
+      case _ => throw new MalformedJsonException
+    }
+  }
+
+  implicit val linkJsonFormat = jsonFormat3(Link)
+  implicit val versionJsonFormat = jsonFormat4(Version)
 }

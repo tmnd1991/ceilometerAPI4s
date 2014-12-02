@@ -3,7 +3,9 @@ package org.openstack.api.restful.ceilometer.v2.elements
 
 
 /**
- * Created by tmnd on 21/10/14.
+ * @author Antonio Murgia
+ * @version 22/10/14
+ * json conversions
  */
 object JsonConversions extends spray.json.DefaultJsonProtocol{
   import java.sql.Timestamp

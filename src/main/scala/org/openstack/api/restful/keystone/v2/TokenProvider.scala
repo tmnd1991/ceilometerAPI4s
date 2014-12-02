@@ -3,7 +3,8 @@ package org.openstack.api.restful.keystone.v2
 import java.net.URL
 
 /**
- * Created by tmnd on 10/11/14.
+ * @author Antonio Murgia
+ * @version 09/11/14
  */
 abstract class TokenProvider(val host : URL, val tenantName : String,  val username : String, val password : String) extends Serializable{
   def token : String

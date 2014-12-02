@@ -1,7 +1,10 @@
 package org.openstack.api.restful.ceilometer.v2.FilterExpressions.ComplexQueryPackage
 
 /**
- * Created by tmnd on 19/10/14.
+ * @author Antonio Murgia
+ * @version 18/10/14
+ * ceilometer MultiComplexExpression representation
+ * as explained at http://wiki.openstack.org/wiki/Ceilometer/ComplexFilterExpressionsInAPIQueries
  */
 case class MultiComplexExpression(o : MultiComplexOperator, expressions : Seq[Expression]) extends ComplexExpression{
   override def toString = expressions.mkString(" " + o.s + " ")

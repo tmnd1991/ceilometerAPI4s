@@ -12,13 +12,13 @@ import org.openstack.api.restful.keystone.v2.elements._
 
 
 /**
- * Created by tmnd on 09/11/14.
+ * @author Antonio Murgia
+ * @version 09/11/14.
  */
 object JsonConversions extends DefaultJsonProtocol{
   //REQUEST
   implicit val PasswordCredentialJsonFormat = jsonFormat2(PasswordCredential)
   implicit val OpenstackCredentialJsonFormat = jsonFormat2(OpenStackCredential)
-  //implicit val AuthorizationJsonFormat = jsonFormat1(Authorization)
 
   //RESPONSE
   implicit object OpenStackTokenMetadataJsonFormat extends JsonFormat[OpenStackTokenMetadata]{
@@ -27,8 +27,8 @@ object JsonConversions extends DefaultJsonProtocol{
                "roles" -> obj.roles.toJson)
     override def read(json: JsValue) = json match{
       case obj : JsObject =>{
-        if (obj.fields.contains("is_admin") && obj.fields.contains("roles")){
-          OpenStackTokenMetadata(obj.fields("is_admin") != 0,
+        if (Set("is_admin","roles") subsetOf obj.fields.keySet){
+          OpenStackTokenMetadata(obj.fields("is_admin").asInstanceOf[JsNumber].value != 0,
                                  obj.fields("roles").convertTo[Seq[String]])
         }
         else throw new MalformedJsonException

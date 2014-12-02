@@ -1,5 +1,7 @@
-import org.openstack.api.restful.ceilometer.v2.FilterExpressions.SimpleQueryPackage.{Operator, SimpleQuery}
-import org.scalatest.{Matchers, FlatSpec}
+//import org.openstack.api.restful.ceilometer.v2.FilterExpressions.SimpleQueryPackage.{Operator, SimpleQuery}
+import org.openstack.api.restful.ceilometer.v2.FilterExpressions.SimpleQueryPackage.Goodies._
+import org.openstack.api.restful.ceilometer.v2.FilterExpressions.FieldValue._
+import org.scalatest._
 
 /**
  * Created by tmnd on 26/11/14.
@@ -14,9 +16,6 @@ class ClientTests extends FlatSpec with Matchers{
     val password = "PUs3dAs?"
     val client = org.openstack.clients.ceilometer.v2.CeilometerClient.getInstance(ceilometerURL, keystoneURL, tenantName, username, password)
     val meter = client.listMeters.head
-    client.listMeters(List(
-      SimpleQuery.apply("project",Operator.eq,meter.project_id)
-    )).foreach(println)
+    val meters = client.listMeters("project" ==== meter.project_id)
   }
-
 }

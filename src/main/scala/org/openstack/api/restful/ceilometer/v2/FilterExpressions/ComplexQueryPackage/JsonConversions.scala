@@ -7,7 +7,9 @@ import org.openstack.api.restful.MalformedJsonException
 import spray.json.{DefaultJsonProtocol, JsObject, JsonWriter, _}
 
 /**
- * Created by tmnd on 19/10/14.
+ * @author Antonio Murgia
+ * @version 18/10/14
+ * Json conversions
  */
 object JsonConversions extends DefaultJsonProtocol{
 
@@ -48,7 +50,7 @@ object JsonConversions extends DefaultJsonProtocol{
     override def write(obj: ComplexQuery) =
     {
       (obj.orderBy, obj.limit) match{
-        case (None, None) => JsObject("filter" -> JsString(obj.filter.toJson.toString()))
+        case (None, None) => JsObject("filter" -> JsString(obj.filter.toJson.compactPrint))
         case (None, Some(_)) =>  JsObject(
                                 "filter" -> JsString(obj.filter.toJson.toString()),
                                 "limit" -> JsNumber(obj.limit.get)
@@ -92,22 +94,6 @@ object JsonConversions extends DefaultJsonProtocol{
             ComplexQuery(FilterJsonFormat.read(obj.fields.getOrElse("filter",throw new MalformedJsonException)),
             Some(obj.fields("limit").convertTo[Int]), Some(orderby))
           }
-          /*
-          case 1 => ComplexQuery((obj.fields.getOrElse("filter",throw new MalformedJsonException)).convertTo[String],None, None)
-          case 2 => if(obj.fields.contains("limit")){
-            ComplexQuery((obj.fields.getOrElse("filter",throw new MalformedJsonException)).convertTo[String],
-              Some(obj.fields("limit").convertTo[Int]),None)
-          }
-          else {
-            val orderby = obj.fields("orderby").convertTo[Seq[OrderBy]]
-            ComplexQuery((obj.fields.getOrElse("filter",throw new MalformedJsonException)).convertTo[String],
-              None, Some(orderby))
-          }
-          case 3 => {
-            val orderby = obj.fields("orderby").convertTo[Seq[OrderBy]]
-            ComplexQuery(FilterJsonFormat.read(obj.fields.getOrElse("filter",throw new MalformedJsonException)),
-              Some(obj.fields("limit").convertTo[Int]), Some(orderby))
-          }*/
         }
       }
       case _ => throw new MalformedJsonException
@@ -176,8 +162,9 @@ object JsonConversions extends DefaultJsonProtocol{
     override def read(json: JsValue): SimpleExpression = {
       json match{
         case obj : JsObject =>{
-          obj.fields.headOption match{
-            case Some(h : (String,JsObject)) =>{
+          if (obj.fields.nonEmpty){
+            try{
+              val h = obj.fields.head.asInstanceOf[(String,JsObject)]
               val op = SimpleOperator.values.getOrElse(h._1,throw new MalformedJsonException)
               val kv = h._2
               kv.fields.headOption match{
@@ -189,8 +176,12 @@ object JsonConversions extends DefaultJsonProtocol{
                 case _ => throw new MalformedJsonException()
               }
             }
-            case _ => throw new MalformedJsonException
+            catch{
+              case t : Throwable => throw new MalformedJsonException()
+            }
           }
+          else
+            throw new MalformedJsonException
         }
         case _ => throw new MalformedJsonException
       }
@@ -205,21 +196,26 @@ object JsonConversions extends DefaultJsonProtocol{
     override def read(json: JsValue): SimpleInExpression = {
       json match{
         case obj : JsObject =>{
-          obj.fields.headOption match{
-            case Some(h : (String,JsObject)) =>{
-              val op = SimpleOperator.values.getOrElse(h._1,throw new MalformedJsonException)
-              val kv = h._2
-              kv.fields.headOption match{
-                case Some(x : (String,JsValue)) =>{
-                  val field = x._1
-                  val value = x._2.convertTo[List[FieldValue]]
-                  SimpleInExpression(field,value,value.head.getType)
+          if (obj.fields.nonEmpty){
+              try{
+                val h = obj.fields.head.asInstanceOf[(String,JsObject)]
+                val op = SimpleOperator.values.getOrElse(h._1,throw new MalformedJsonException)
+                val kv = h._2
+                kv.fields.headOption match{
+                  case Some(x : (String,JsValue)) =>{
+                    val field = x._1
+                    val value = x._2.convertTo[List[FieldValue]]
+                    SimpleInExpression(field,value,value.head.getType)
+                  }
+                  case _ => throw new MalformedJsonException()
                 }
-                case _ => throw new MalformedJsonException()
               }
-            }
-            case _ => throw new MalformedJsonException
+              catch{
+                case t: Throwable => throw new MalformedJsonException()
+              }
           }
+          else
+            throw new MalformedJsonException
         }
         case _ => throw new MalformedJsonException
       }
@@ -246,5 +242,4 @@ object JsonConversions extends DefaultJsonProtocol{
       case _ => throw new MalformedJsonException
     }
   }
-
 }

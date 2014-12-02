@@ -4,7 +4,8 @@ import java.sql.Timestamp
 import java.util.Date
 
 /**
- * Created by tmnd on 09/11/14.
+ * @author Antonio Murgia
+ * @version 09/11/14
  */
 case class OpenStackToken(issued_at : Timestamp,
                           expires : Date,

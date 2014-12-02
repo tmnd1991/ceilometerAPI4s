@@ -1,17 +1,20 @@
 package org.openstack.api.restful.ceilometer.v2.FilterExpressions.ComplexQueryPackage
 
 /**
- * Created by tmnd on 19/10/14.
+ * @author Antonio Murgia
+ * @version 18/10/14
+ * ceilometer SimpleOperator representation
+ * as explained at http://wiki.openstack.org/wiki/Ceilometer/ComplexFilterExpressionsInAPIQueries
  */
 abstract class SimpleOperator(val s : String){
 }
 object SimpleOperator{
-  val values = Map("=" -> Equals,
-                   "!=" -> NotEquals,
-                   ">" -> GreaterThan,
-                   ">=" -> GreaterOrEqualsThan,
-                   "<" -> LesserThan,
-                   "<=" -> LesserOrEqualsThan)
+  val values = Map(Equals.s -> Equals,
+                   NotEquals.s -> NotEquals,
+                   GreaterThan.s -> GreaterThan,
+                   GreaterOrEqualsThan.s -> GreaterOrEqualsThan,
+                   LesserThan.s -> LesserThan,
+                   LesserOrEqualsThan.s -> LesserOrEqualsThan)
   object Equals extends SimpleOperator("=")
   object NotEquals extends SimpleOperator("!=")
   object GreaterThan extends SimpleOperator(">")

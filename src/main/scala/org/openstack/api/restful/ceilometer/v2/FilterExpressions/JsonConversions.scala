@@ -10,7 +10,8 @@ import spray.json
 import spray.json._
 
 /**
- * Created by tmnd on 20/10/14.
+ * @author Antonio Murgia
+ * @version 21/10/14
  */
 object JsonConversions extends json.DefaultJsonProtocol{
 

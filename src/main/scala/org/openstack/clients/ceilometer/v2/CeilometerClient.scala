@@ -1,24 +1,31 @@
 package org.openstack.clients.ceilometer.v2
 
 
-
-
+import java.io.{InputStreamReader, BufferedReader}
 import java.net.URL
-import uk.co.bigbeeconsultants.http.header.{Header, Headers, MediaType}
-import uk.co.bigbeeconsultants.http.request.RequestBody
-import uk.co.bigbeeconsultants.http.url.Href
-import uk.co.bigbeeconsultants.http.{Config, ModdedHttpClient}
+import java.util.Date
+
+import org.eclipse.jetty.client.{HttpClient, HttpExchange}
+import org.eclipse.jetty.client.util.StringContentProvider
+import org.eclipse.jetty.http.HttpMethod
+import org.openstack.api.restful.ceilometer.v2.FilterExpressions.ComplexQueryPackage._
+import org.openstack.api.restful.ceilometer.v2.FilterExpressions.ComplexQueryPackage.Goodies._
+import org.openstack.api.restful.ceilometer.v2.FilterExpressions.SimpleQueryPackage._
+import org.openstack.api.restful.ceilometer.v2.FilterExpressions.SimpleQueryPackage.Goodies._
+
 import spray.json._
-import org.openstack.api.restful.ceilometer.v2.elements.Meter
+import spray.json.MyMod._
+import org.openstack.api.restful.ceilometer.v2.elements.{Statistics, Meter}
 import org.openstack.api.restful.ceilometer.v2.requests.MetersListGETRequest
 import org.openstack.api.restful.ceilometer.v2.requests.MetersListGETRequestJsonConversion._
 import org.openstack.api.restful.keystone.v2.KeystoneTokenProvider
 import org.openstack.api.restful.ceilometer.v2.elements.JsonConversions._
-import org.openstack.api.restful.ceilometer.v2.FilterExpressions.Query
+import org.openstack.api.restful.ceilometer.v2.FilterExpressions.{FieldValue, Query}
 import org.openstack.api.restful.ceilometer.v2.FilterExpressions.JsonConversions._
 
 /**
- * Created by tmnd on 26/11/14.
+ * @author Antonio Murgia
+ * @version 26/11/14
  */
 class CeilometerClient(ceilometerUrl : URL,
                        keystoneUrl : URL,
@@ -28,34 +35,116 @@ class CeilometerClient(ceilometerUrl : URL,
                        connectTimeout : Int = 10000,
                        readTimeout : Int = 10000) {
   private val tokenProvider = KeystoneTokenProvider.getInstance(keystoneUrl, tenantName, username, password)
-  private val httpClient = new ModdedHttpClient(Config(connectTimeout        = connectTimeout,
-                                                       readTimeout           = readTimeout,
-                                                       followRedirects       = false))
+  private val httpClient = new HttpClient()
+  httpClient.setConnectTimeout(connectTimeout)
+  httpClient.setFollowRedirects(false)
+  httpClient.setStopTimeout(readTimeout)
+  httpClient.start()
 
-  def listMeters = {
-    val request = new MetersListGETRequest(List())
+  def listMeters : Seq[Meter] = {
+    val request = new MetersListGETRequest(List.empty)
     tokenProvider.tokenOption match{
       case Some(s : String) => {
-        val resp = httpClient.get(new URL(ceilometerUrl.toString + request.relativeURL),
-                       Headers(Header("X-Auth-Token",s)))
-        import spray.json.DefaultJsonProtocol._
-        resp.body.toString.parseJson.convertTo[Seq[Meter]]
+        val uri = new URL(ceilometerUrl.toString + request.relativeURL).toURI
+        val resp = httpClient.newRequest(uri).
+          method(HttpMethod.GET).
+          header("X-Auth-Token",s).send()
+        try{
+          val json = resp.getContentAsString.tryParseJson
+          if (json != None){
+            import spray.json.DefaultJsonProtocol._
+            json.get.tryConvertTo[Seq[Meter]].
+              getOrElse(List.empty)
+          }
+          else
+            List.empty
+        }
+        catch{
+          case t : Throwable => {
+            List.empty
+          }
+        }
+
       }
+      case _ => List.empty
     }
   }
-  def listMeters(q : Seq[Query]) = {
+
+  def listMeters(q : Query*) : Seq[Meter] = {
     val request = new MetersListGETRequest(q)
-    val body = request.toJson.toString
+    val body = request.toJson.compactPrint
     tokenProvider.tokenOption match{
       case Some(s : String) => {
-        val resp = httpClient.get(
-          new URL(ceilometerUrl.toString + request.relativeURL),
-          Headers(Header("X-Auth-Token",s)),
-          Some(RequestBody(body,MediaType.APPLICATION_JSON)))
-        import spray.json.DefaultJsonProtocol._
-        resp.body.toString.parseJson.convertTo[List[Meter]]
+        val uri = new URL(ceilometerUrl.toString + request.relativeURL).toURI
+        val resp = httpClient.newRequest(uri).
+          method(HttpMethod.GET).
+          header("X-Auth-Token",s).
+          content(new StringContentProvider(body)).
+          send()
+        try{
+          val json = resp.getContentAsString.tryParseJson
+          if (json != None){
+            import spray.json.DefaultJsonProtocol._
+            json.get.tryConvertTo[Seq[Meter]].
+              getOrElse(List.empty)
+          }
+          else
+            List.empty
+        }
+        catch{
+          case t : Throwable => {
+            List.empty
+          }
+        }
+
       }
+      case _ => List.empty
     }
+  }
+
+  def getStatistics(m : Meter) : List[Statistics] = {
+    val uri = new URL(ceilometerUrl.toString + "v2/meters/" + m.name + "/statistics").toURI
+    tokenProvider.tokenOption match{
+      case Some(s : String) => {
+        val resp = httpClient.newRequest(uri).header("X-Auth-Token",s).send
+        val json = resp.getContentAsString.tryParseJson
+        if (json != None) {
+          import spray.json.DefaultJsonProtocol._
+          json.get.tryConvertTo[List[Statistics]].getOrElse(List.empty)
+        }
+        else List.empty
+      }
+      case _ => List.empty
+    }
+  }
+
+  def getStatistics(m : Meter, from : Date, to : Date) : List[Statistics] = {
+    require(from.before(to))
+    //GOODIES :)
+    import org.openstack.api.restful.ceilometer.v2.FilterExpressions.ComplexQueryPackage.Goodies._
+    val exp = ("timestamp" GT from) AND ("timestamp" LE to)
+    val query = ComplexQuery(exp)
+    //TODO CONVERT REQUEST INTO STRING
+    val body = ""
+    val uri = new URL(ceilometerUrl.toString + "v2/meters/" + m.name + "/statistics").toURI
+    tokenProvider.tokenOption match{
+      case Some(s : String) => {
+        val resp = httpClient.newRequest(uri).
+          header("X-Auth-Token",s).
+          content(new StringContentProvider(body)).send
+        val json = resp.getContentAsString.tryParseJson
+        if (json != None) {
+          import spray.json.DefaultJsonProtocol._
+          json.get.tryConvertTo[List[Statistics]].getOrElse(List.empty)
+        }
+        else List.empty
+      }
+      case _ => List.empty
+    }
+  }
+  def shutdown() = {
+    if (httpClient.isStarted)
+      httpClient.stop()
   }
 }
 object CeilometerClient{

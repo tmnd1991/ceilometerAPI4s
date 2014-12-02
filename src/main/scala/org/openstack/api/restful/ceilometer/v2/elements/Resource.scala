@@ -5,7 +5,9 @@ import java.util.Date
 
 import org.openstack.api.restful.elements.Link
 /**
- * Created by tmnd on 21/10/14.
+ * @author Antonio Murgia
+ * @version 22/10/14
+ * ceilometer Resource representation
  */
 case class Resource(first_sample_timestamp : Option[Timestamp],
                     last_sample_timestamp : Option[Timestamp],
@@ -21,8 +23,6 @@ case class Resource(first_sample_timestamp : Option[Timestamp],
   require(resource_id.nonEmpty)
   require(source != null)
   require(source.nonEmpty)
-  require(user_id != null)
-  require(user_id.nonEmpty)
 }
 /**
 Type:	datetime
