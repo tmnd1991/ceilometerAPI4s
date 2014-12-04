@@ -1,9 +1,9 @@
 package org.openstack.api.restful.ceilometer.v2.elements
 
 /**
+ * ceilometer MeterType representation
  * @author Antonio Murgia
  * @version 22/10/14
- * ceilometer MeterType representation
  */
 class MeterType(val s : String){
   override def toString = s

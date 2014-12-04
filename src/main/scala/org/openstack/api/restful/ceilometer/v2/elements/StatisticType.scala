@@ -1,9 +1,9 @@
 package org.openstack.api.restful.ceilometer.v2.elements
 
 /**
+ * ceilometer StatisticType representation
  * @author Antonio Murgia
  * @version 22/10/14
- * ceilometer StatisticType representation
  */
 class StatisticType(val s : String) {
 

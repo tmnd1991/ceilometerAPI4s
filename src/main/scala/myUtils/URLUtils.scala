@@ -3,7 +3,9 @@ package myUtils
 import java.net.URL
 
 /**
- * Created by tmnd on 10/10/14.
+ * Wrappers of java functions to manipulate URLS
+ * @author Antonio Murgia
+ * @version 04/12/2014
  */
 object URLUtils {
   def apply(s : String) = try{

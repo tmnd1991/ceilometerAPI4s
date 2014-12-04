@@ -1,9 +1,9 @@
 package org.openstack.api.restful.ceilometer.v2.elements
 
 /**
+ * ceilometer AlarmChange representation
  * @author Antonio Murgia
  * @version 22/10/14
- * ceilometer AlarmChange representation
  */
 import java.util.Date
 

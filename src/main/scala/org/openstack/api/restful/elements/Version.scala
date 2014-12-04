@@ -1,11 +1,10 @@
 package org.openstack.api.restful.elements
 
 import java.util.Date
-//import myUtils.DateUtils
-import spray.json.DefaultJsonProtocol
 
 /**
- * Created by tmnd on 10/10/14.
+ * @author Antonio Murgia
+ * @version 04/12/2014
  */
 case class Version(status : String, updated : Date, id : String, links : Seq[Link]) {
   require(status != null)

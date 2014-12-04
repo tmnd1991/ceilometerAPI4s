@@ -4,9 +4,9 @@ import org.openstack.api.restful.ceilometer.v2.FilterExpressions._
 
 
 /**
+ * Some shorthand syntax to create SimpleQueries
  * @author Antonio Murgia
  * @version 21/10/14
- *          Some shorthand syntax to create SimpleQueries
  */
 object Goodies {
   implicit class FieldName(val s : String) extends AnyVal {

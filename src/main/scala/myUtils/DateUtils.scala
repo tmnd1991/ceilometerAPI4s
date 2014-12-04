@@ -4,7 +4,9 @@ import java.text.SimpleDateFormat
 import java.util.Date
 
 /**
- * Created by tmnd on 10/10/14.
+ * Wrappers of java functions to manipulate Dates
+ * @author Antonio Murgia
+ * @version 04/12/2014
  */
 object DateUtils {
   def parseOption(stringDate : String, format : String = "yyyy-MM-dd'T'HH:mm:ss'Z'") : Option[Date] = {

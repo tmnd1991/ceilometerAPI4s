@@ -4,7 +4,9 @@ import java.sql.Timestamp
 import java.text.SimpleDateFormat
 
 /**
- * Created by tmnd on 22/10/14.
+ * Wrappers of java functions to manipulate Timestamps
+ * @author Antonio Murgia
+ * @version 04/12/2014
  */
 object TimestampUtils {
   def parse(stringTimestamp : String) = Timestamp.valueOf(stringTimestamp.replaceAll("T", " "))

@@ -3,9 +3,9 @@ package org.openstack.api.restful.ceilometer.v2.elements
 
 
 /**
+ * json conversions
  * @author Antonio Murgia
  * @version 22/10/14
- * json conversions
  */
 object JsonConversions extends spray.json.DefaultJsonProtocol{
   import java.sql.Timestamp
@@ -18,8 +18,7 @@ object JsonConversions extends spray.json.DefaultJsonProtocol{
   import org.openstack.api.restful.elements.JsonConversions._
 
   implicit object MeterTypeJsonFormat extends JsonFormat[MeterType] {
-    def write(mt: MeterType) =
-      JsString(mt.s)
+    def write(mt: MeterType) = JsString(mt.s)
 
     def read(value: JsValue) = value match {
       case JsString(x) => MeterType.values.getOrElse(x,throw new MalformedJsonException)

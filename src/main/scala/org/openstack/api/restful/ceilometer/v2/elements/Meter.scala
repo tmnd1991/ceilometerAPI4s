@@ -1,9 +1,9 @@
 package org.openstack.api.restful.ceilometer.v2.elements
 
 /**
+ * ceilometer Meter representation
  * @author Antonio Murgia
  * @version 22/10/14
- * ceilometer Meter representation
  */
 case class Meter(meter_id : String,
                  name : String,

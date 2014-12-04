@@ -1,15 +1,15 @@
 package org.openstack.api.restful.ceilometer.v2.FilterExpressions.ComplexQueryPackage
 
-import myUtils.{TypeExtractor, DateUtils}
+import myUtils.DateUtils
 import org.openstack.api.restful.ceilometer.v2.FilterExpressions._
 import org.openstack.api.restful.ceilometer.v2.FilterExpressions.JsonConversions._
 import org.openstack.api.restful.MalformedJsonException
 import spray.json.{DefaultJsonProtocol, JsObject, JsonWriter, _}
 
 /**
+ * Json conversions
  * @author Antonio Murgia
  * @version 18/10/14
- * Json conversions
  */
 object JsonConversions extends DefaultJsonProtocol{
 

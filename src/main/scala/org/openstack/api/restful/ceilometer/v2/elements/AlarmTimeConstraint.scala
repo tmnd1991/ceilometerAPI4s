@@ -1,9 +1,9 @@
 package org.openstack.api.restful.ceilometer.v2.elements
 
 /**
+ * ceilometer AlarmTimeConstraint representation
  * @author Antonio Murgia
  * @version 22/10/14
- * ceilometer AlarmTimeConstraint representation
  */
 case class AlarmTimeConstraint(description : String, duration : Int, name : String, start : String, timezone : String) {
 

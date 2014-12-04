@@ -1,9 +1,9 @@
 package org.openstack.api.restful.ceilometer.v2.FilterExpressions.SimpleQueryPackage
 
 /**
+ * ceilometer SimpleQuery Permitted Operators
  * @author Antonio Murgia
  * @version 19/10/14
- * ceilometer SimpleQuery Permitted Operators
  */
 abstract class Operator(val s : String) extends Serializable
 

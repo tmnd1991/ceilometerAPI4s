@@ -4,7 +4,9 @@ import org.openstack.api.restful.MalformedJsonException
 import spray.json._
 import java.net.URL
 /**
- * Created by tmnd on 09/11/14.
+ * URL spray Json conversions
+ * @author Antonio Murgia
+ * @version 04/12/2014
  */
 object URLJsonConversion extends DefaultJsonProtocol{
   implicit object UrlJsonFormat extends JsonFormat[URL]{

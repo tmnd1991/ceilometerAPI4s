@@ -2,9 +2,6 @@ package org.openstack.api.restful.elements
 
 import java.net.URL
 
-import spray.json.DefaultJsonProtocol
-
-
 /**
  * @author Antonio Murgia
  * @version 10/10/14

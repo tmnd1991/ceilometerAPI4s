@@ -1,10 +1,10 @@
 package org.openstack.api.restful.ceilometer.v2.FilterExpressions.ComplexQueryPackage
 
 /**
- * @author Antonio Murgia
- * @version 18/10/14
  * ceilometer ComplexQuery representation
  * as explained at http://wiki.openstack.org/wiki/Ceilometer/ComplexFilterExpressionsInAPIQueries
+ * @author Antonio Murgia
+ * @version 18/10/14
  */
 
 import org.openstack.api.restful.ceilometer.v2.FilterExpressions.ComplexQueryPackage.JsonConversions.FilterJsonFormat

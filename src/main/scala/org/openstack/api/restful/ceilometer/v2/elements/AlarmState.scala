@@ -1,9 +1,9 @@
 package org.openstack.api.restful.ceilometer.v2.elements
 
 /**
+ * ceilometer AlarmState representation
  * @author Antonio Murgia
  * @version 22/10/14
- * ceilometer AlarmState representation
  */
 case class AlarmState(s : String)
 object AlarmState{

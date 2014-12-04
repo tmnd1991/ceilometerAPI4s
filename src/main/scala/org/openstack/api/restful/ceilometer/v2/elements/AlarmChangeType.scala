@@ -1,9 +1,9 @@
 package org.openstack.api.restful.ceilometer.v2.elements
 
 /**
+ * ceilometer AlarmChangeType representation
  * @author Antonio Murgia
  * @version 22/10/14
- * ceilometer AlarmChangeType representation
  */
 class AlarmChangeType(val s : String)
 object AlarmChangeType{

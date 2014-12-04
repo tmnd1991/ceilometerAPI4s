@@ -1,9 +1,9 @@
 package org.openstack.api.restful.ceilometer.v2.elements
 
 /**
+ * ceilometer AlarmCombinationRule representation
  * @author Antonio Murgia
  * @version 22/10/14
- * ceilometer AlarmCombinationRule representation
  */
 case class AlarmCombinationRule(alarm_ids : Seq[String],
                                 operator : String) {

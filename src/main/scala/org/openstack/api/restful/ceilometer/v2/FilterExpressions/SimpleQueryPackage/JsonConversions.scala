@@ -1,7 +1,6 @@
 package org.openstack.api.restful.ceilometer.v2.FilterExpressions.SimpleQueryPackage
 
 
-import myUtils.TypeExtractor
 import org.openstack.api.restful.ceilometer.v2.FilterExpressions._
 import org.openstack.api.restful.ceilometer.v2.FilterExpressions.JsonConversions._
 import org.openstack.api.restful.MalformedJsonException
@@ -9,6 +8,7 @@ import java.util.Date
 import spray.json._
 
 /**
+ * json conversions
  * @author Antonio Murgia
  * @version 20/10/14
  */

@@ -1,10 +1,10 @@
 package org.openstack.api.restful.ceilometer.v2.FilterExpressions
 
 /**
- * @author Antonio Murgia
- * @version 19/10/14
  * class that wraps booleans, integer, floats, string and dates that are the only values permitted
  * in a ceilometer query
+ * @author Antonio Murgia
+ * @version 19/10/14
  */
 abstract class FieldValue(val getType : String) extends Serializable{
   val value : Any

@@ -1,9 +1,9 @@
 package spray.json
 
 /**
+ * Some modding to spray-json
  * @author Antonio Murgia
  * @version 27/11/14
- * Some modding to spray-json
  */
 object MyMod {
   implicit class pimpedString(s : String){

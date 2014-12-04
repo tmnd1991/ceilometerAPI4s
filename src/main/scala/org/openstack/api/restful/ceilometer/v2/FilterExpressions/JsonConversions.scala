@@ -6,14 +6,14 @@ import org.openstack.api.restful.ceilometer.v2.FilterExpressions.ComplexQueryPac
 import org.openstack.api.restful.ceilometer.v2.FilterExpressions.SimpleQueryPackage.JsonConversions.SimpleQueryJsonFormat
 import org.openstack.api.restful.ceilometer.v2.FilterExpressions.SimpleQueryPackage.SimpleQuery
 import org.openstack.api.restful.MalformedJsonException
-import spray.json
 import spray.json._
 
 /**
+ * json conversions
  * @author Antonio Murgia
  * @version 21/10/14
  */
-object JsonConversions extends json.DefaultJsonProtocol{
+object JsonConversions extends DefaultJsonProtocol{
 
   implicit object QueryJsonFormat extends JsonFormat[Query]{
     override def read(json: JsValue) = json match{

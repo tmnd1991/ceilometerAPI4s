@@ -15,15 +15,17 @@ import org.openstack.api.restful.ceilometer.v2.FilterExpressions.SimpleQueryPack
 
 import spray.json._
 import spray.json.MyMod._
-import org.openstack.api.restful.ceilometer.v2.elements.{Statistics, Meter}
-import org.openstack.api.restful.ceilometer.v2.requests.MetersListGETRequest
+import org.openstack.api.restful.ceilometer.v2.elements.{Aggregate, Statistics, Meter}
+import org.openstack.api.restful.ceilometer.v2.requests.{MeterStatisticsGETRequest, MetersListGETRequest}
 import org.openstack.api.restful.ceilometer.v2.requests.MetersListGETRequestJsonConversion._
+import org.openstack.api.restful.ceilometer.v2.requests.MeterStatisticsGETRequestJsonProtocol._
 import org.openstack.api.restful.keystone.v2.KeystoneTokenProvider
 import org.openstack.api.restful.ceilometer.v2.elements.JsonConversions._
 import org.openstack.api.restful.ceilometer.v2.FilterExpressions.{FieldValue, Query}
 import org.openstack.api.restful.ceilometer.v2.FilterExpressions.JsonConversions._
 
 /**
+ * High level object that offers services to queyr a ceilometer endpoint
  * @author Antonio Murgia
  * @version 26/11/14
  */
@@ -106,7 +108,7 @@ class CeilometerClient(ceilometerUrl : URL,
     val uri = new URL(ceilometerUrl.toString + "v2/meters/" + m.name + "/statistics").toURI
     tokenProvider.tokenOption match{
       case Some(s : String) => {
-        val resp = httpClient.newRequest(uri).header("X-Auth-Token",s).send
+        val resp = httpClient.newRequest(uri).method(HttpMethod.GET).header("X-Auth-Token",s).send
         val json = resp.getContentAsString.tryParseJson
         if (json != None) {
           import spray.json.DefaultJsonProtocol._
@@ -120,16 +122,17 @@ class CeilometerClient(ceilometerUrl : URL,
 
   def getStatistics(m : Meter, from : Date, to : Date) : List[Statistics] = {
     require(from.before(to))
-    //GOODIES :)
+
     import org.openstack.api.restful.ceilometer.v2.FilterExpressions.ComplexQueryPackage.Goodies._
     val exp = ("timestamp" GT from) AND ("timestamp" LE to)
     val query = ComplexQuery(exp)
-    //TODO CONVERT REQUEST INTO STRING
-    val body = ""
-    val uri = new URL(ceilometerUrl.toString + "v2/meters/" + m.name + "/statistics").toURI
+    val request = MeterStatisticsGETRequest(m.name, List(query))
+    val body = request.toJson.toString
+    val uri = new URL(ceilometerUrl.toString + request.relativeURL).toURI
     tokenProvider.tokenOption match{
       case Some(s : String) => {
         val resp = httpClient.newRequest(uri).
+          method(HttpMethod.GET).
           header("X-Auth-Token",s).
           content(new StringContentProvider(body)).send
         val json = resp.getContentAsString.tryParseJson
@@ -142,11 +145,13 @@ class CeilometerClient(ceilometerUrl : URL,
       case _ => List.empty
     }
   }
+
   def shutdown() = {
     if (httpClient.isStarted)
       httpClient.stop()
   }
 }
+
 object CeilometerClient{
   private val instances : scala.collection.mutable.Map[Int,CeilometerClient] = scala.collection.mutable.Map()
 
@@ -157,7 +162,6 @@ object CeilometerClient{
     instances(hashCode)
   }
 
-  private def getHashCode(vals : Any*) = {
-    vals.mkString("").hashCode
-  }
+  private def getHashCode(vals : Any*) = vals.mkString("").hashCode
+
 }

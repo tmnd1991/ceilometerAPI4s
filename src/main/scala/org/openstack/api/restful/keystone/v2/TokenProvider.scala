@@ -3,10 +3,12 @@ package org.openstack.api.restful.keystone.v2
 import java.net.URL
 
 /**
+ * Interface of a tokenProvider, an object (better to be managed as a Flyweight)
+ * known implementations are KeystoneProvider
  * @author Antonio Murgia
  * @version 09/11/14
  */
-abstract class TokenProvider(val host : URL, val tenantName : String,  val username : String, val password : String) extends Serializable{
+trait TokenProvider extends Serializable{
   def token : String
   def tokenOption : Option[String] = {
     try{

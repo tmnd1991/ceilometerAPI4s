@@ -3,9 +3,9 @@ package org.openstack.api.restful.ceilometer.v2.FilterExpressions.ComplexQueryPa
 import scala.language.implicitConversions
 import org.openstack.api.restful.ceilometer.v2.FilterExpressions._
 /**
+ * shorthand syntax for creating expressions
  * @author Antonio Murgia
  * @version 18/10/14
- * shorthand syntax for creating expressions
  */
 object Goodies {
   def NOT(e : Expression) = UnaryComplexExpression(UnaryComplexOperator.NotOperator,e)

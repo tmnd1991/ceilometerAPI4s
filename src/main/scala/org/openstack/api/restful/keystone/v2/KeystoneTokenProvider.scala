@@ -20,11 +20,12 @@ import org.openstack.api.restful.keystone.v2.responses.JsonConversions._
 import scala.collection._
 
 /**
+ * Implementation of TokenProvider that provides token fetched from openstack Keystone
  * @author Antonio Murgia
  * @version 02/11/2014
  */
 private class KeystoneTokenProvider(host : URL, tenantName : String,  username : String, password : String)
-  extends TokenProvider(host, tenantName,  username, password)
+  extends TokenProvider
 {
   case class TokenInfo(id : String, localIssuedAt : Date, duration : Long)
 
@@ -70,7 +71,7 @@ object KeystoneTokenProvider{
   private val providers : mutable.Map[Int,KeystoneTokenProvider] = mutable.Map()
 
   def getInstance(host : URL, tenantName : String,  username : String, password : String) : TokenProvider = {
-    val hashed = (host.toString + tenantName + username + password).hashCode
+    val hashed = getHashCode(host, tenantName, username, password).hashCode
     if (providers.contains(hashed)){
       providers(hashed)
     }
@@ -80,4 +81,5 @@ object KeystoneTokenProvider{
       newProvider
     }
   }
+  private def getHashCode(vals : Any*) = vals.mkString("").hashCode
 }

@@ -3,9 +3,9 @@ package org.openstack.api.restful.ceilometer.v2.elements
 import java.util.Date
 
 /**
+ * ceilometer Statistics representation
  * @author Antonio Murgia
  * @version 22/10/14
- * ceilometer Statistics representation
  */
 case class Statistics(aggregate : Option[Map[String,Float]],
                       avg : Float,
