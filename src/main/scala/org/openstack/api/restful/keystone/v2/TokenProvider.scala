@@ -9,7 +9,14 @@ import java.net.URL
  * @version 09/11/14
  */
 trait TokenProvider extends Serializable{
+  /**
+   * @return the Token in the form of a String
+   */
   def token : String
+
+  /**
+   * @return Some Token or None if an error occurs
+   */
   def tokenOption : Option[String] = {
     try{
       Some(token)

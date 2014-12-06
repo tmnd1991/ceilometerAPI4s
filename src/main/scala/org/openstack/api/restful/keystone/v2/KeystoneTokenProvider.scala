@@ -1,8 +1,6 @@
 package org.openstack.api.restful.keystone.v2
 
-import java.awt.PageAttributes.MediaType
 import java.net.URL
-import java.sql.Timestamp
 import java.util.Date
 import org.eclipse.jetty.client._
 import org.eclipse.jetty.client.util.StringContentProvider
@@ -30,6 +28,8 @@ private class KeystoneTokenProvider(host : URL, tenantName : String,  username :
   case class TokenInfo(id : String, localIssuedAt : Date, duration : Long)
 
   private val client = new HttpClient()
+  //these values are a bit random, there's some reasoning behind the choice, but not too much.
+  //I don't really know the drawbacks we get from increasing their size.
   client.setRequestBufferSize(16384)
   client.setResponseBufferSize(32768)
 
@@ -44,12 +44,15 @@ private class KeystoneTokenProvider(host : URL, tenantName : String,  username :
     tokens(hash).id
   }
 
+  /**
+   *
+   * @return a new Token for the passed values of username, password, host and tenant name got from Keystone
+   *         RESTFUL API.
+   */
   private def newToken = {
     val a = TokenPOSTRequest(OpenStackCredential(tenantName,PasswordCredential(username,password)))
     val aString = a.toJson.toString
-
     val url = new URL(host.toString + a.relativeURL).toURI
-
     val response = client.POST(url).
       header("Content-Type","application/json").
       content(new StringContentProvider(aString)).send()
@@ -62,14 +65,29 @@ private class KeystoneTokenProvider(host : URL, tenantName : String,  username :
   }
 
   private def isExpired(hash : Int) = {
-    val tokenInfo = tokens(hash)
-    new Date().after(new Date(tokenInfo.localIssuedAt.getTime + tokenInfo.duration))
+    if (tokens.contains(hash)){
+      val tokenInfo = tokens(hash)
+      new Date().after(new Date(tokenInfo.localIssuedAt.getTime + tokenInfo.duration))
+    }
+    else false
   }
 }
 
+/**
+ * Implements the Flyweight pattern to retrieve an instance of KeystoneTokenProvider.
+ * Stores tokens in order to not retrieve them everytime.
+ */
 object KeystoneTokenProvider{
   private val providers : mutable.Map[Int,KeystoneTokenProvider] = mutable.Map()
 
+  /**
+   *
+   * @param host the Keystone endpoint
+   * @param tenantName the Keystone tenant name
+   * @param username the Keystone username
+   * @param password the Keystone password
+   * @return
+   */
   def getInstance(host : URL, tenantName : String,  username : String, password : String) : TokenProvider = {
     val hashed = getHashCode(host, tenantName, username, password).hashCode
     if (providers.contains(hashed)){

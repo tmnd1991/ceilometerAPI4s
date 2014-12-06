@@ -1,6 +1,5 @@
 package org.openstack.api.restful.elements
 
-import java.net.URL
 import java.util.Date
 
 import spray.json._

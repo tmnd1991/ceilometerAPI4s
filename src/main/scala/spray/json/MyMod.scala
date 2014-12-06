@@ -8,6 +8,10 @@ package spray.json
 object MyMod {
   implicit class pimpedString(s : String){
     import spray.json._
+
+    /**
+     * @return Some JsValue if the parsing is successful or None if an error occurs
+     */
     def tryParseJson = {
       try{
         Some(s.parseJson)
@@ -18,6 +22,10 @@ object MyMod {
     }
   }
   implicit class pimpedJson(json : spray.json.JsValue){
+    /**
+     * @tparam T the class to the json has to be converted to
+     * @return Some instance of class T or None if an error occurs
+     */
     def tryConvertTo[T : JsonReader] = {
       try{
         Some(json.convertTo[T])
