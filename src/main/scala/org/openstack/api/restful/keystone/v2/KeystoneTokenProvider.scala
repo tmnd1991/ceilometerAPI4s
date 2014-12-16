@@ -2,6 +2,7 @@ package org.openstack.api.restful.keystone.v2
 
 import java.net.URL
 import java.util.Date
+import myUtils.DateUtils
 import org.eclipse.jetty.client._
 import org.eclipse.jetty.client.util.StringContentProvider
 import org.eclipse.jetty.http.HttpMethod
@@ -32,6 +33,7 @@ private class KeystoneTokenProvider(host : URL, tenantName : String,  username :
   //I don't really know the drawbacks we get from increasing their size.
   client.setRequestBufferSize(16384)
   client.setResponseBufferSize(32768)
+  client.start
 
   private val tokens : mutable.Map[Int, TokenInfo] = mutable.Map()
 
@@ -53,12 +55,15 @@ private class KeystoneTokenProvider(host : URL, tenantName : String,  username :
     val a = TokenPOSTRequest(OpenStackCredential(tenantName,PasswordCredential(username,password)))
     val aString = a.toJson.toString
     val url = new URL(host.toString + a.relativeURL).toURI
-    val response = client.POST(url).
+
+    val request = client.POST(url).
       header("Content-Type","application/json").
-      content(new StringContentProvider(aString)).send()
+      content(new StringContentProvider(aString))
+    val response = request.send()
 
     val body = response.getContentAsString
     val tokenResponse = body.parseJson.convertTo[TokenResponse]
+
     new TokenInfo(tokenResponse.access.token.id,
                   new Date(),
                   tokenResponse.access.token.expires.getTime - tokenResponse.access.token.issued_at.getTime)

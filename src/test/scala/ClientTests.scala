@@ -1,4 +1,8 @@
 //import org.openstack.api.restful.ceilometer.v2.FilterExpressions.SimpleQueryPackage.{Operator, SimpleQuery}
+
+import java.util.Date
+
+import myUtils.DateUtils
 import org.openstack.api.restful.ceilometer.v2.FilterExpressions.SimpleQueryPackage.Goodies._
 import org.openstack.api.restful.ceilometer.v2.FilterExpressions.FieldValue._
 import org.scalatest._
@@ -14,8 +18,12 @@ class ClientTests extends FlatSpec with Matchers{
     val tenantName = "ceilometer_project"
     val username = "amurgia"
     val password = "PUs3dAs?"
+
     val client = org.openstack.clients.ceilometer.v2.CeilometerClient.getInstance(ceilometerURL, keystoneURL, tenantName, username, password)
-    val meter = client.listMeters.head
-    val meters = client.listMeters("project" ==== meter.project_id)
+
+    val meters = client.listMeters
+
+    val statistics = client.getStatistics(meters.head)
+
   }
 }

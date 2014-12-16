@@ -6,6 +6,7 @@ import java.net.URL
 import java.util.Date
 
 
+import myUtils.DateUtils
 import spray.json._
 import spray.json.MyMod._
 
@@ -43,6 +44,8 @@ class CeilometerClient(ceilometerUrl : URL,
   httpClient.setConnectTimeout(connectTimeout)
   httpClient.setFollowRedirects(false)
   httpClient.setStopTimeout(readTimeout)
+  httpClient.setRequestBufferSize(16384)
+  httpClient.setResponseBufferSize(32768)
   httpClient.start()
 
   /**
@@ -54,15 +57,19 @@ class CeilometerClient(ceilometerUrl : URL,
     tokenProvider.tokenOption match{
       case Some(s : String) => {
         val uri = new URL(ceilometerUrl.toString + request.relativeURL).toURI
+
         val resp = httpClient.newRequest(uri).
           method(HttpMethod.GET).
           header("X-Auth-Token",s).send()
         try{
-          val json = resp.getContentAsString.tryParseJson
+          val body = resp.getContentAsString
+
+          val json = body.tryParseJson
           if (json != None){
             import spray.json.DefaultJsonProtocol._
-            json.get.tryConvertTo[Seq[Meter]].
-              getOrElse(List.empty)
+            val list = json.get.tryConvertTo[Seq[Meter]].getOrElse(List.empty)
+
+            list
           }
           else
             List.empty
@@ -115,11 +122,12 @@ class CeilometerClient(ceilometerUrl : URL,
    * @return All the statistics about that meter
    */
   def getStatistics(m : Meter) : List[Statistics] = {
-    val uri = new URL(ceilometerUrl.toString + "v2/meters/" + m.name + "/statistics").toURI
+    val uri = new URL(ceilometerUrl.toString + "/v2/meters/" + m.name + "/statistics").toURI
     tokenProvider.tokenOption match{
       case Some(s : String) => {
         val resp = httpClient.newRequest(uri).method(HttpMethod.GET).header("X-Auth-Token",s).send
-        val json = resp.getContentAsString.tryParseJson
+        val body = resp.getContentAsString
+        val json = body.tryParseJson
         if (json != None) {
           import spray.json.DefaultJsonProtocol._
           json.get.tryConvertTo[List[Statistics]].getOrElse(List.empty)

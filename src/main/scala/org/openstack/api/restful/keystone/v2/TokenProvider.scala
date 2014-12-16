@@ -22,7 +22,9 @@ trait TokenProvider extends Serializable{
       Some(token)
     }
     catch{
-      case _ : Throwable => None
+      case t : Throwable => {
+        None
+      }
     }
   }
 }
