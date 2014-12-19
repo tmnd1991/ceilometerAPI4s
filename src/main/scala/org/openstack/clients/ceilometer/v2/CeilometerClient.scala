@@ -1,6 +1,5 @@
 package org.openstack.clients.ceilometer.v2
 
-
 import java.io.{InputStreamReader, BufferedReader}
 import java.net.URL
 import java.util.Date
@@ -50,44 +49,10 @@ class CeilometerClient(ceilometerUrl : URL,
 
   /**
    *
-   * @return a collection of meters avaiable if an error occurs the collection will be empty
-   */
-  def listMeters : Seq[Meter] = {
-    val request = new MetersListGETRequest(List.empty)
-    tokenProvider.tokenOption match{
-      case Some(s : String) => {
-        val uri = new URL(ceilometerUrl.toString + request.relativeURL).toURI
-
-        val resp = httpClient.newRequest(uri).
-          method(HttpMethod.GET).
-          header("X-Auth-Token",s).send()
-        try{
-          val body = resp.getContentAsString
-
-          val json = body.tryParseJson
-          if (json != None){
-            import spray.json.DefaultJsonProtocol._
-            val list = json.get.tryConvertTo[Seq[Meter]].getOrElse(List.empty)
-
-            list
-          }
-          else
-            List.empty
-        }
-        catch{
-          case t : Throwable => List.empty
-        }
-      }
-      case _ => List.empty
-    }
-  }
-
-  /**
-   *
    * @param q any number of queries to filter the meters
-   * @return a collection of meters filtered by the query params if an error occurs the collection will be empty
+   * @return tries to return a collection of meters filtered by the query params if an error occurs return None
    */
-  def listMeters(q : Query*) : Seq[Meter] = {
+  def tryListMeters(q : Query*) : Option[Seq[Meter]] = {
     val request = new MetersListGETRequest(q)
     val body = request.toJson.compactPrint
     tokenProvider.tokenOption match{
@@ -102,26 +67,41 @@ class CeilometerClient(ceilometerUrl : URL,
           val json = resp.getContentAsString.tryParseJson
           if (json != None){
             import spray.json.DefaultJsonProtocol._
-            json.get.tryConvertTo[Seq[Meter]].
-              getOrElse(List.empty)
+            json.get.tryConvertTo[Seq[Meter]]
           }
           else
-            List.empty
+            None
         }
         catch{
-          case t : Throwable => List.empty
+          case t : Throwable => None
         }
       }
-      case _ => List.empty
+      case _ => None
     }
   }
 
   /**
+   * @param q any number of queries to filter the meters
+   * @return a collection of meters filtered by the query params if any error occurs an empty Seq is returned
+   */
+  def listMeters(q : Query*) : Seq[Meter] = tryListMeters(q:_*).getOrElse(List.empty)
+
+  /**
+   * @return Some collection of meters avaiable if an error occurs returns None
+   */
+  def tryListMeters : Option[Seq[Meter]] = tryListMeters(Seq.empty:_*)
+
+  /**
+   * @return a collection of meters avaiable if an error occurs an empty Seq is returned
+   */
+  def listMeters : Seq[Meter] = tryListMeters.getOrElse(List.empty)
+
+  /**
    *
    * @param m the Meter the Statistics is relative to.
-   * @return All the statistics about that meter
+   * @return Some statistics about that meter or None if an error occurs
    */
-  def getStatistics(m : Meter) : List[Statistics] = {
+  def tryGetStatistics(m : Meter) : Option[Seq[Statistics]] = {
     val uri = new URL(ceilometerUrl.toString + "/v2/meters/" + m.name + "/statistics").toURI
     tokenProvider.tokenOption match{
       case Some(s : String) => {
@@ -130,22 +110,29 @@ class CeilometerClient(ceilometerUrl : URL,
         val json = body.tryParseJson
         if (json != None) {
           import spray.json.DefaultJsonProtocol._
-          json.get.tryConvertTo[List[Statistics]].getOrElse(List.empty)
+          json.get.tryConvertTo[List[Statistics]]
         }
-        else List.empty
+        else None
       }
-      case _ => List.empty
+      case _ => None
     }
   }
+
+  /**
+   *
+   * @param m the Meter the Statistics is relative to.
+   * @return Statistics about that meter or an empty Seq if an error occurs
+   */
+  def getStatistics(m : Meter) : Seq[Statistics] = tryGetStatistics(m).getOrElse(List.empty)
+
   /**
    * @param from
    * @param to
    * @param m the Meter the Statistics is relative to.
-   * @return All the statistics about that meter from a Date to another
+   * @return Some statistics about that meter from a Date to another or None if an error occurs
    */
-  def getStatistics(m : Meter, from : Date, to : Date) : List[Statistics] = {
-    if (to before from)
-      List.empty
+  def tryGetStatistics(m : Meter, from : Date, to : Date) : Option[Seq[Statistics]] = {
+    if (to before from) None
     else{
       import org.openstack.api.restful.ceilometer.v2.FilterExpressions.ComplexQueryPackage.Goodies._
       val exp = ("timestamp" GT from) AND ("timestamp" LE to)
@@ -162,14 +149,22 @@ class CeilometerClient(ceilometerUrl : URL,
           val json = resp.getContentAsString.tryParseJson
           if (json != None) {
             import spray.json.DefaultJsonProtocol._
-            json.get.tryConvertTo[List[Statistics]].getOrElse(List.empty)
+            json.get.tryConvertTo[List[Statistics]]
           }
-          else List.empty
+          else None
         }
-        case _ => List.empty
+        case _ => None
       }
     }
   }
+
+  /**
+   * @param from
+   * @param to
+   * @param m the Meter the Statistics is relative to.
+   * @return statistics about that meter from a Date to another or an empty Seq if an error occurs
+   */
+  def getStatistics(m : Meter, from : Date, to : Date) : Seq[Statistics] = tryGetStatistics(m, from, to).getOrElse(List.empty)
 
   /**
    * called to shutdown the httpClient
@@ -185,13 +180,13 @@ class CeilometerClient(ceilometerUrl : URL,
  */
 object CeilometerClient{
   private val instances : scala.collection.mutable.Map[Int,CeilometerClient] = scala.collection.mutable.Map()
-  def getInstance(ceilometerUrl : URL, keystoneUrl : URL, tenantName : String,  username : String, password : String) = {
-    val hashcode = getHashCode(ceilometerUrl,keystoneUrl,tenantName,username,password)
-    if (!instances.contains(hashCode))
-      instances(hashCode) = new CeilometerClient(ceilometerUrl, keystoneUrl, tenantName,  username, password)
-    instances(hashCode)
+  def getInstance(ceilometerUrl : URL, keystoneUrl : URL, tenantName : String,  username : String, password : String, connectTimeout : Int = 10000, readTimeout : Int = 10000) = {
+    this.synchronized{
+      val hashcode = getHashCode(ceilometerUrl,keystoneUrl,tenantName,username,password)
+      if (!instances.contains(hashCode))
+        instances(hashCode) = new CeilometerClient(ceilometerUrl, keystoneUrl, tenantName,  username, password, connectTimeout, readTimeout)
+      instances(hashCode)
+    }
   }
-
   private def getHashCode(vals : Any*) = vals.mkString("").hashCode
-
 }

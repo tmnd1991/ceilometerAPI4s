@@ -38,12 +38,14 @@ private class KeystoneTokenProvider(host : URL, tenantName : String,  username :
   private val tokens : mutable.Map[Int, TokenInfo] = mutable.Map()
 
   override def token = {
-    val hash = (host.toString+tenantName+username+password).hashCode
-    if (!tokens.contains(hash) || isExpired(hash)){
-      val tokenInfo = newToken
-      tokens(hash) = tokenInfo
+    this.synchronized{
+      val hash = (host.toString+tenantName+username+password).hashCode
+      if (!tokens.contains(hash) || isExpired(hash)){
+        val tokenInfo = newToken
+        tokens(hash) = tokenInfo
+      }
+      tokens(hash).id
     }
-    tokens(hash).id
   }
 
   /**
