@@ -1,6 +1,6 @@
 name := "ceilometerapiwrapper"
 
-version := "0.4"
+version := "0.5"
 
 organization := "it.unibo.ing.smacs"
 

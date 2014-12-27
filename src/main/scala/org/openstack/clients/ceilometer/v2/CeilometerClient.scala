@@ -54,7 +54,10 @@ class CeilometerClient(ceilometerUrl : URL,
    */
   def tryListMeters(q : Query*) : Option[Seq[Meter]] = {
     val request = new MetersListGETRequest(q)
-    val body = request.toJson.compactPrint
+    val body = if (q.isEmpty)
+      ""
+    else
+      request.toJson.compactPrint
     tokenProvider.tokenOption match{
       case Some(s : String) => {
         val uri = new URL(ceilometerUrl.toString + request.relativeURL).toURI
@@ -89,7 +92,7 @@ class CeilometerClient(ceilometerUrl : URL,
   /**
    * @return Some collection of meters avaiable if an error occurs returns None
    */
-  def tryListMeters : Option[Seq[Meter]] = tryListMeters(Seq.empty:_*)
+  def tryListMeters : Option[Seq[Meter]] = tryListMeters()
 
   /**
    * @return a collection of meters avaiable if an error occurs an empty Seq is returned

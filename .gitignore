@@ -1,22 +1,22 @@
+.idea/scopes/
+.idea/dictionaries/
+.idea/inspectionProfiles/
+.idea/libraries/
+.idea/modules/
+.idea/.name
+.idea/*.xml
+!.idea/vcs.xml
+/classes
+/dist
+/out
+/SDK/*SDK
+/target
+/*.bat
 *.class
-*.log
-
-# sbt specific
-.cache/
-.history/
-.lib/
-dist/*
+out
+build
+.DS_Store
+*~
 target/
-lib_managed/
-src_managed/
-project/boot/
-project/plugins/project/
-
-# Scala-IDE specific
-.scala_dependencies
-.worksheet
-
-# Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm
-/*.iml
-## Directory-based project format:
-.idea/
+.idea
+testdata/debugger
