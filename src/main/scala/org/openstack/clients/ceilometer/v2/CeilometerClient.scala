@@ -19,9 +19,13 @@ import org.openstack.api.restful.ceilometer.v2.FilterExpressions.JsonConversions
 import org.openstack.api.restful.ceilometer.v2.FilterExpressions.ComplexQueryPackage.Goodies._
 import org.openstack.api.restful.ceilometer.v2.FilterExpressions.SimpleQueryPackage._
 import org.openstack.api.restful.ceilometer.v2.FilterExpressions.SimpleQueryPackage.Goodies._
-import org.openstack.api.restful.ceilometer.v2.elements.{Aggregate, Statistics, Meter}
-import org.openstack.api.restful.ceilometer.v2.requests.{MeterStatisticsGETRequest, MetersListGETRequest}
+import org.openstack.api.restful.ceilometer.v2.elements.{OldSample, Aggregate, Statistics, Meter}
+import org.openstack.api.restful.ceilometer.v2.requests.{MeterGETRequest, MeterStatisticsGETRequest, MetersListGETRequest}
+
+
 import org.openstack.api.restful.ceilometer.v2.requests.MetersListGETRequestJsonConversion._
+import org.openstack.api.restful.ceilometer.v2.requests.MeterGETRequestJsonConversion._
+
 import org.openstack.api.restful.ceilometer.v2.requests.MeterStatisticsGETRequestJsonProtocol._
 import org.openstack.api.restful.ceilometer.v2.elements.JsonConversions._
 import org.openstack.api.restful.keystone.v2.KeystoneTokenProvider
@@ -44,7 +48,7 @@ class CeilometerClient(ceilometerUrl : URL,
   httpClient.setFollowRedirects(false)
   httpClient.setStopTimeout(readTimeout)
   httpClient.setRequestBufferSize(16384)
-  httpClient.setResponseBufferSize(32768)
+  httpClient.setResponseBufferSize(65536)
   httpClient.start()
 
   /**
@@ -52,7 +56,7 @@ class CeilometerClient(ceilometerUrl : URL,
    * @param q any number of queries to filter the meters
    * @return tries to return a collection of meters filtered by the query params if an error occurs return None
    */
-  def tryListMeters(q : Query*) : Option[Seq[Meter]] = {
+  def tryListMeters(q : Seq[Query]) : Option[Seq[Meter]] = {
     val request = new MetersListGETRequest(q)
     val body = if (q.isEmpty)
       ""
@@ -63,6 +67,7 @@ class CeilometerClient(ceilometerUrl : URL,
         val uri = new URL(ceilometerUrl.toString + request.relativeURL).toURI
         val resp = httpClient.newRequest(uri).
           method(HttpMethod.GET).
+          header("Content-Type","application/json").
           header("X-Auth-Token",s).
           content(new StringContentProvider(body)).
           send()
@@ -84,28 +89,23 @@ class CeilometerClient(ceilometerUrl : URL,
   }
 
   /**
+   * @return Some collection of meters avaiable if an error occurs returns None
+   */
+  def tryListMeters : Option[Seq[Meter]] = tryListMeters(Seq.empty)
+
+  /**
    * @param q any number of queries to filter the meters
    * @return a collection of meters filtered by the query params if any error occurs an empty Seq is returned
    */
-  def listMeters(q : Query*) : Seq[Meter] = tryListMeters(q:_*).getOrElse(List.empty)
-
-  /**
-   * @return Some collection of meters avaiable if an error occurs returns None
-   */
-  def tryListMeters : Option[Seq[Meter]] = tryListMeters()
+  def listMeters(q : Query*) : Seq[Meter] = tryListMeters(q).getOrElse(List.empty)
 
   /**
    * @return a collection of meters avaiable if an error occurs an empty Seq is returned
    */
   def listMeters : Seq[Meter] = tryListMeters.getOrElse(List.empty)
 
-  /**
-   *
-   * @param m the Meter the Statistics is relative to.
-   * @return Some statistics about that meter or None if an error occurs
-   */
-  def tryGetStatistics(m : Meter) : Option[Seq[Statistics]] = {
-    val uri = new URL(ceilometerUrl.toString + "/v2/meters/" + m.name + "/statistics").toURI
+  def tryGetStatistics(meterName : String) : Option[Seq[Statistics]] = {
+    val uri = new URL(ceilometerUrl.toString + "/v2/meters/" + meterName + "/statistics").toURI
     tokenProvider.tokenOption match{
       case Some(s : String) => {
         val resp = httpClient.newRequest(uri).method(HttpMethod.GET).header("X-Auth-Token",s).send
@@ -113,7 +113,8 @@ class CeilometerClient(ceilometerUrl : URL,
         val json = body.tryParseJson
         if (json != None) {
           import spray.json.DefaultJsonProtocol._
-          json.get.tryConvertTo[List[Statistics]]
+          val result = json.get.tryConvertTo[List[Statistics]]
+          result
         }
         else None
       }
@@ -122,25 +123,17 @@ class CeilometerClient(ceilometerUrl : URL,
   }
 
   /**
-   *
-   * @param m the Meter the Statistics is relative to.
-   * @return Statistics about that meter or an empty Seq if an error occurs
-   */
-  def getStatistics(m : Meter) : Seq[Statistics] = tryGetStatistics(m).getOrElse(List.empty)
-
-  /**
    * @param from
    * @param to
-   * @param m the Meter the Statistics is relative to.
+   * @param meterName the name of the meter the Statistics is relative to.
    * @return Some statistics about that meter from a Date to another or None if an error occurs
    */
-  def tryGetStatistics(m : Meter, from : Date, to : Date) : Option[Seq[Statistics]] = {
+  def tryGetStatistics(meterName : String, from : Date, to : Date) : Option[Seq[Statistics]] = {
     if (to before from) None
     else{
-      import org.openstack.api.restful.ceilometer.v2.FilterExpressions.ComplexQueryPackage.Goodies._
-      val exp = ("timestamp" GT from) AND ("timestamp" LE to)
-      val query = ComplexQuery(exp)
-      val request = MeterStatisticsGETRequest(m.name, List(query))
+      import org.openstack.api.restful.ceilometer.v2.FilterExpressions.SimpleQueryPackage.Goodies._
+      val queries = List(("timestamp" >>>> from),("timestamp" <<== to))
+      val request = MeterStatisticsGETRequest(meterName, queries)
       val body = request.toJson.toString
       val uri = new URL(ceilometerUrl.toString + request.relativeURL).toURI
       tokenProvider.tokenOption match{
@@ -148,6 +141,7 @@ class CeilometerClient(ceilometerUrl : URL,
           val resp = httpClient.newRequest(uri).
             method(HttpMethod.GET).
             header("X-Auth-Token",s).
+            header("Content-Type","application/json").
             content(new StringContentProvider(body)).send
           val json = resp.getContentAsString.tryParseJson
           if (json != None) {
@@ -161,14 +155,64 @@ class CeilometerClient(ceilometerUrl : URL,
     }
   }
 
+  def getStatistics(meterName : String) : Seq[Statistics] = tryGetStatistics(meterName).getOrElse(List.empty)
+
   /**
    * @param from
    * @param to
-   * @param m the Meter the Statistics is relative to.
+   * @param meterName the name of the Meter the Statistics is relative to.
    * @return statistics about that meter from a Date to another or an empty Seq if an error occurs
    */
-  def getStatistics(m : Meter, from : Date, to : Date) : Seq[Statistics] = tryGetStatistics(m, from, to).getOrElse(List.empty)
+  def getStatistics(meterName : String, from : Date, to : Date) : Seq[Statistics] = tryGetStatistics(meterName, from, to).getOrElse(List.empty)
 
+  def tryGetSamples(meterName : String) : Option[Seq[OldSample]] = {
+    val uri = new URL(ceilometerUrl.toString + "/v2/meters/" + meterName).toURI
+    tokenProvider.tokenOption match{
+      case Some(s : String) => {
+        val resp = httpClient.newRequest(uri).method(HttpMethod.GET).header("X-Auth-Token",s).send
+        val body = resp.getContentAsString
+        val json = body.tryParseJson
+        if (json != None) {
+          import spray.json.DefaultJsonProtocol._
+          val result = json.get.tryConvertTo[List[OldSample]]
+          result
+        }
+        else None
+      }
+      case _ => None
+    }
+  }
+
+  def getSamples(meterName : String) : Seq[OldSample] = tryGetSamples(meterName).getOrElse(Seq.empty)
+
+  def tryGetSamples(meterName : String, from : Date, to : Date) : Option[Seq[OldSample]] = {
+    if (to before from) None
+    else{
+      import org.openstack.api.restful.ceilometer.v2.FilterExpressions.SimpleQueryPackage.Goodies._
+      val queries = List(("timestamp" >>>> from),("timestamp" <<== to))
+      val request = MeterGETRequest(meterName, Some(queries))
+      val body = request.toJson.compactPrint
+      val uri = new URL(ceilometerUrl.toString + request.relativeURL).toURI
+      tokenProvider.tokenOption match{
+        case Some(s : String) => {
+          val resp = httpClient.newRequest(uri).
+            method(HttpMethod.GET).
+            header("X-Auth-Token",s).
+            header("Content-Type","application/json").
+            content(new StringContentProvider(body)).send
+          val json = resp.getContentAsString.tryParseJson
+          if (json.isDefined) {
+            import spray.json.DefaultJsonProtocol._
+            json.get.tryConvertTo[List[OldSample]]
+          }
+          else None
+        }
+        case _ => None
+      }
+    }
+  }
+
+  def getSamples(meterName : String, from : Date, to : Date) : Seq[OldSample] = tryGetSamples(meterName, from , to).getOrElse(Seq.empty)
   /**
    * called to shutdown the httpClient
    */

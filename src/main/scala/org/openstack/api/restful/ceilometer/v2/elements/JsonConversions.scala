@@ -116,10 +116,10 @@ object JsonConversions extends spray.json.DefaultJsonProtocol{
         val sum = obj.fields("sum").convertTo[Float]
         val unit = obj.fields("unit").convertTo[String]
         val jsGroupby = obj.fields.get("groupby")
-        val groupby = if (jsGroupby==None) None
+        val groupby = if (jsGroupby == None || jsGroupby.get == JsNull) None
                       else Some(jsGroupby.get.convertTo[Map[String,String]])
         val jsAgg = obj.fields.get("aggregate")
-        val agg = if (jsAgg == None) None
+        val agg = if (jsAgg == None || jsAgg.get == JsNull) None
                   else Some(jsAgg.get.convertTo[Map[String,Float]])
         Statistics(agg, avg, count, duration, duration_end, duration_start, groupby, max, min, period, period_end, period_start, sum, unit)
       }

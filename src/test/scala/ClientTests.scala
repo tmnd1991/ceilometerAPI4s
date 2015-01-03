@@ -23,7 +23,13 @@ class ClientTests extends FlatSpec with Matchers{
 
     val meters = client.listMeters
 
-    val statistics = client.getStatistics(meters.head)
+    //val statistics = client.getStatistics(meters.head.name, new Date(new Date().getTime - 360000000), new Date())
+
+    val samples = client.tryGetSamples(meters.head.name, new Date(new Date().getTime - 36000), new Date())
+
+    //statistics should not be (Seq.empty)
+
+    samples should not be (None)
 
   }
 }
