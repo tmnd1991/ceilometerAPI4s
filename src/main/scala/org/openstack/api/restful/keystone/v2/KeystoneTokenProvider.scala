@@ -31,15 +31,21 @@ private class KeystoneTokenProvider(host : URL, tenantName : String,  username :
   private val client = new HttpClient()
   //these values are a bit random, there's some reasoning behind the choice, but not too much.
   //I don't really know the drawbacks we get from increasing their size.
+  val hash = (host.toString+tenantName+username+password).hashCode
   client.setRequestBufferSize(16384)
   client.setResponseBufferSize(32768)
   client.start
 
   private val tokens : mutable.Map[Int, TokenInfo] = mutable.Map()
 
+  override def invalidate = {
+    this.synchronized{
+      tokens(hash) = newToken
+    }
+  }
+
   override def token = {
     this.synchronized{
-      val hash = (host.toString+tenantName+username+password).hashCode
       if (!tokens.contains(hash) || isExpired(hash)){
         val tokenInfo = newToken
         tokens(hash) = tokenInfo
@@ -76,7 +82,7 @@ private class KeystoneTokenProvider(host : URL, tenantName : String,  username :
       val tokenInfo = tokens(hash)
       new Date().after(new Date(tokenInfo.localIssuedAt.getTime + tokenInfo.duration))
     }
-    else false
+    else true
   }
 }
 

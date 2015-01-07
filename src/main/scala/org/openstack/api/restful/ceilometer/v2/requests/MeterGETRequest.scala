@@ -19,9 +19,9 @@ object MeterGETRequestJsonConversion extends spray.json.DefaultJsonProtocol{
     override def write(obj: MeterGETRequest) = {
       val mapb = scala.collection.mutable.Map[String,JsValue]()
       if (obj.q.isDefined)
-        mapb + ("q" -> obj.q.get.toJson)
+        mapb("q") = obj.q.get.toJson
       if (obj.limit != 0)
-        mapb + ("limit" -> obj.limit.toJson)
+        mapb("limit") = obj.limit.toJson
       JsObject(mapb.toMap)
     }
   }

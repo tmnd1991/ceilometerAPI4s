@@ -13,12 +13,11 @@ case class Resource(first_sample_timestamp : Option[Timestamp],
                     last_sample_timestamp : Option[Timestamp],
                     links : Seq[Link],
                     metadata : Map[String,String],
-                    project_id : String,
+                    project_id : Option[String],
                     resource_id : String,
                     source : String,
-                    user_id : String) {
+                    user_id : Option[String]) {
   require(project_id != null)
-  require(project_id.nonEmpty)
   require(resource_id != null)
   require(resource_id.nonEmpty)
   require(source != null)

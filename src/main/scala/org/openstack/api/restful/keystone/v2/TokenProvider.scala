@@ -14,6 +14,10 @@ trait TokenProvider extends Serializable{
    */
   def token : String
 
+  /*
+   * invalidates the current token
+   */
+  def invalidate : Unit
   /**
    * @return Some Token or None if an error occurs
    */
@@ -23,6 +27,7 @@ trait TokenProvider extends Serializable{
     }
     catch{
       case t : Throwable => {
+        invalidate
         None
       }
     }

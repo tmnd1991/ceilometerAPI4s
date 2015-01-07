@@ -20,9 +20,11 @@ case class OldSample(counter_name : String,
                       resource_metadata : Map[String, String],
                       source : String,
                       timestamp : Timestamp,
-                      user_id : String
+                      user_id : Option[String]
                      )
 /*
+
+user_id == null
 
 counter_name
 Type:	unicode
