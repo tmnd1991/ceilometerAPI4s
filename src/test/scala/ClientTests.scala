@@ -20,12 +20,12 @@ class ClientTests extends FlatSpec with Matchers{
   val password = "PUs3dAs?"
 
   lazy val client = org.openstack.clients.ceilometer.v2.CeilometerClient.getInstance(ceilometerURL, keystoneURL, tenantName, username, password,30000, 360000)
-  var meters : Option[Seq[Meter]] = _
-  var resources : Option[Seq[Resource]] = _
+  lazy val meters = client.tryListAllMeters
+  lazy val resources = client.tryListAllResources
   "there " should " be some meters " in {
-    meters = client.tryListMeters
     meters should not be None
     meters.get.isEmpty should be (false)
+    println(s"there are ${meters.get.size} meters")
   }
 
   "there " should " be some statistics about meters in the last 10 hours" in {
@@ -35,15 +35,15 @@ class ClientTests extends FlatSpec with Matchers{
   }
 
   "there " should " be some resources " in {
-    resources = client.tryGetResources
     resources should not be None
     resources.get.isEmpty should be (false)
+    println(s"there are ${resources.get.size} resources")
   }
 
   "there " should " be some samples about resources in the last 10 hours" in {
-    client.tryGetSamples(resources.get.head.resource_id, new Date(new Date().getTime - 36000000), new Date())
-    resources should not be None
-    resources.get.isEmpty should be (false)
+    val samples = client.tryGetSamplesOfResource(resources.get.head.resource_id, new Date(new Date().getTime - 36000000), new Date())
+    samples should not be None
+    samples.get.isEmpty should be (false)
+    println(s"there are ${samples.get.size} samples")
   }
-
 }

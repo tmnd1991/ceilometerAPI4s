@@ -42,8 +42,8 @@ class CeilometerClient(ceilometerUrl : URL,
                        username : String,
                        password : String,
                        connectTimeout : Int = 10000,
-                       readTimeout : Int = 10000) {
-  private val oldsample_size = 800
+                       readTimeout : Int = 10000) extends ICeilometerClient {
+  private val sample_size = 800
   private val responseBufferSize = 524288
   private val requestBufferSize = 16384
   private val tokenProvider = KeystoneTokenProvider.getInstance(keystoneUrl, tenantName, username, password)
@@ -55,12 +55,8 @@ class CeilometerClient(ceilometerUrl : URL,
   httpClient.setResponseBufferSize(responseBufferSize)
   httpClient.start()
 
-  /**
-   *
-   * @param q any number of queries to filter the meters
-   * @return tries to return a collection of meters filtered by the query params if an error occurs return None
-   */
-  def tryListMeters(q : Seq[Query]) : Option[Seq[Meter]] = {
+
+  override def tryListMeters(q : Seq[Query]) : Option[Seq[Meter]] = {
     val request = new MetersListGETRequest(q)
     val body = if (q.isEmpty)
       ""
@@ -93,23 +89,7 @@ class CeilometerClient(ceilometerUrl : URL,
     }
   }
 
-  /**
-   * @return Some collection of meters avaiable if an error occurs returns None
-   */
-  def tryListMeters : Option[Seq[Meter]] = tryListMeters(Seq.empty)
-
-  /**
-   * @param q any number of queries to filter the meters
-   * @return a collection of meters filtered by the query params if any error occurs an empty Seq is returned
-   */
-  def listMeters(q : Query*) : Seq[Meter] = tryListMeters(q).getOrElse(List.empty)
-
-  /**
-   * @return a collection of meters avaiable if an error occurs an empty Seq is returned
-   */
-  def listMeters : Seq[Meter] = tryListMeters.getOrElse(List.empty)
-
-  def tryGetStatistics(meterName : String) : Option[Seq[Statistics]] = {
+  override def tryGetStatistics(meterName : String) : Option[Seq[Statistics]] = {
     val uri = new URL(ceilometerUrl.toString + "/v2/meters/" + meterName + "/statistics").toURI
     tokenProvider.tokenOption match{
       case Some(s : String) => {
@@ -131,13 +111,7 @@ class CeilometerClient(ceilometerUrl : URL,
     }
   }
 
-  /**
-   * @param from
-   * @param to
-   * @param meterName the name of the meter the Statistics is relative to.
-   * @return Some statistics about that meter from a Date to another or None if an error occurs
-   */
-  def tryGetStatistics(meterName : String, from : Date, to : Date) : Option[Seq[Statistics]] = {
+  override def tryGetStatistics(meterName : String, from : Date, to : Date) : Option[Seq[Statistics]] = {
     if (to before from) None
     else{
       import org.openstack.api.restful.ceilometer.v2.FilterExpressions.SimpleQueryPackage.Goodies._
@@ -166,23 +140,12 @@ class CeilometerClient(ceilometerUrl : URL,
     }
   }
 
-  def getStatistics(meterName : String) : Seq[Statistics] = tryGetStatistics(meterName).getOrElse(List.empty)
-
-  /**
-   * @param from
-   * @param to
-   * @param meterName the name of the Meter the Statistics is relative to.
-   * @return statistics about that meter from a Date to another or an empty Seq if an error occurs
-   */
-  def getStatistics(meterName : String, from : Date, to : Date) : Seq[Statistics] = tryGetStatistics(meterName, from, to).getOrElse(List.empty)
-
-  /*
-  def tryGetSamples(meterName : String, from : Date, to : Date) : Option[Seq[OldSample]] = {
+  override def tryGetSamplesOfMeter(meterName : String, from : Date, to : Date) : Option[Seq[OldSample]] = {
     if (to before from) None
     else{
       import org.openstack.api.restful.ceilometer.v2.FilterExpressions.SimpleQueryPackage.Goodies._
       val queries = List(("timestamp" >>>> from),("timestamp" <<== to))
-      val request = MeterGETRequest(meterName, Some(queries), responseBufferSize/oldsample_size)
+      val request = MeterGETRequest(meterName, Some(queries), responseBufferSize/sample_size)
       val uri = new URL(ceilometerUrl.toString + request.relativeURL).toURI
       tokenProvider.tokenOption match{
         case Some(s : String) => {
@@ -206,15 +169,14 @@ class CeilometerClient(ceilometerUrl : URL,
     }
   }
 
-  def getSamples(meterName : String, from : Date, to : Date) : Seq[OldSample] = tryGetSamples(meterName, from , to).getOrElse(Seq.empty)
-  */
-  def tryGetSamples(resource_id : String, from : Date, to :Date) : Option[Seq[Sample]] = {
+
+  override def tryGetSamplesOfResource(resource_id : String, from : Date, to :Date) : Option[Seq[Sample]] = {
     if (to before from) None
     else{
       import org.openstack.api.restful.ceilometer.v2.requests.SamplesGETRequestJsonConversion._
       import org.openstack.api.restful.ceilometer.v2.FilterExpressions.SimpleQueryPackage.Goodies._
       val queries = List(("timestamp" >>>> from),("timestamp" <<== to),("resource_id" ==== resource_id))
-      val request = SamplesGETRequest(Some(queries), responseBufferSize / oldsample_size)
+      val request = SamplesGETRequest(Some(queries), responseBufferSize / sample_size)
       val uri = new URL(ceilometerUrl.toString + request.relativeURL).toURI
       tokenProvider.tokenOption match{
         case Some(s : String) => {
@@ -237,10 +199,9 @@ class CeilometerClient(ceilometerUrl : URL,
       }
     }
   }
-  def getSample(resource_id : String, from : Date, to :Date) : Seq[Sample] = tryGetSamples(resource_id, from, to).getOrElse(Seq.empty)
 
-  def tryListResources : Option[Seq[Resource]] = {
-    val req = ResourcesListGETRequest()
+  override def tryListResources(queries : Seq[Query]) : Option[Seq[Resource]] = {
+    val req = ResourcesListGETRequest(queries)
     val uri = new URL(ceilometerUrl.toString + req.relativeURL).toURI
     tokenProvider.tokenOption match{
       case Some(s : String) => {
@@ -261,12 +222,7 @@ class CeilometerClient(ceilometerUrl : URL,
     }
   }
 
-  def listResources : Seq[Resource] = tryListResources.getOrElse(Seq.empty)
-
-  /**
-   * called to shutdown the httpClient
-   */
-  def shutdown() = {
+  override def shutdown() = {
     if (httpClient.isStarted)
       httpClient.stop()
   }
