@@ -1,6 +1,6 @@
 package org.openstack.api.restful.ceilometer.v2.FilterExpressions.ComplexQueryPackage
 
-import myUtils.DateUtils
+import it.unibo.ing.utils.DateUtils
 import org.openstack.api.restful.ceilometer.v2.FilterExpressions._
 import org.openstack.api.restful.ceilometer.v2.FilterExpressions.JsonConversions._
 import org.openstack.api.restful.MalformedJsonException

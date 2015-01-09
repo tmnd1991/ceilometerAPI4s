@@ -5,8 +5,8 @@ import java.util.Date
 
 import spray.json._
 import DefaultJsonProtocol._
-import myUtils.URLJsonConversion._
-import myUtils.{TimestampUtils, DateUtils}
+import spray.json.URLConversion._
+import it.unibo.ing.utils._
 import org.openstack.api.restful.MalformedJsonException
 import org.openstack.api.restful.keystone.v2.elements._
 
@@ -58,7 +58,7 @@ object JsonConversions extends DefaultJsonProtocol{
       case s : JsString => TimestampUtils.parseOption(s.value).getOrElse(throw new MalformedJsonException)
       case _ => throw new MalformedJsonException
     }
-    override def write(obj: Timestamp) =  JsString(myUtils.TimestampUtils.format(obj))
+    override def write(obj: Timestamp) =  JsString(TimestampUtils.format(obj))
   }
 
   implicit object DateJsonFormat extends JsonFormat[java.util.Date]{

@@ -2,7 +2,7 @@ package org.openstack.api.restful.keystone.v2
 
 import java.net.URL
 import java.util.Date
-import myUtils.DateUtils
+import it.unibo.ing.utils._
 import org.eclipse.jetty.client._
 import org.eclipse.jetty.client.util.StringContentProvider
 import org.eclipse.jetty.http.HttpMethod

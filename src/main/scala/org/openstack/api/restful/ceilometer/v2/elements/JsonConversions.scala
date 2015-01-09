@@ -16,6 +16,7 @@ object JsonConversions extends spray.json.DefaultJsonProtocol{
   import org.openstack.api.restful.ceilometer.v2.FilterExpressions.SimpleQueryPackage.JsonConversions._
   import org.openstack.api.restful.ceilometer.v2.FilterExpressions.JsonConversions._
   import org.openstack.api.restful.elements.JsonConversions._
+  import it.unibo.ing.utils._
 
   implicit object MeterTypeJsonFormat extends JsonFormat[MeterType] {
     def write(mt: MeterType) = JsString(mt.s)
@@ -28,14 +29,14 @@ object JsonConversions extends spray.json.DefaultJsonProtocol{
 
   implicit object TimestampJsonFormat extends JsonFormat[java.sql.Timestamp] {
     override def read(json: JsValue) = json match{
-      case s : JsString => myUtils.TimestampUtils.parseOption(s.value) match{
+      case s : JsString => TimestampUtils.parseOption(s.value) match{
         case Some(t : java.sql.Timestamp) => t
         case _ => throw new MalformedJsonException
       }
       case _ => throw new MalformedJsonException
     }
 
-    override def write(obj: Timestamp) =  JsString(myUtils.TimestampUtils.format(obj))
+    override def write(obj: Timestamp) =  JsString(TimestampUtils.format(obj))
   }
 
   implicit val ResourceJsonFormat = jsonFormat8(Resource)
@@ -106,13 +107,13 @@ object JsonConversions extends spray.json.DefaultJsonProtocol{
         val avg = obj.fields("avg").convertTo[Float]
         val count = obj.fields("count").convertTo[Int]
         val duration = obj.fields("duration").convertTo[Float]
-        val duration_end = myUtils.DateUtils.parse(obj.fields("duration_end").convertTo[String],"yyyy-MM-dd'T'HH:mm:ss")
-        val duration_start = myUtils.DateUtils.parse(obj.fields("duration_start").convertTo[String],"yyyy-MM-dd'T'HH:mm:ss")
+        val duration_end = DateUtils.parse(obj.fields("duration_end").convertTo[String],"yyyy-MM-dd'T'HH:mm:ss")
+        val duration_start = DateUtils.parse(obj.fields("duration_start").convertTo[String],"yyyy-MM-dd'T'HH:mm:ss")
         val max = obj.fields("max").convertTo[Float]
         val min = obj.fields("min").convertTo[Float]
         val period = obj.fields("period").convertTo[Int]
-        val period_end = myUtils.DateUtils.parse(obj.fields("period_end").convertTo[String],"yyyy-MM-dd'T'HH:mm:ss")
-        val period_start = myUtils.DateUtils.parse(obj.fields("period_start").convertTo[String],"yyyy-MM-dd'T'HH:mm:ss")
+        val period_end = DateUtils.parse(obj.fields("period_end").convertTo[String],"yyyy-MM-dd'T'HH:mm:ss")
+        val period_start = DateUtils.parse(obj.fields("period_start").convertTo[String],"yyyy-MM-dd'T'HH:mm:ss")
         val sum = obj.fields("sum").convertTo[Float]
         val unit = obj.fields("unit").convertTo[String]
         val jsGroupby = obj.fields.get("groupby")
@@ -134,13 +135,13 @@ object JsonConversions extends spray.json.DefaultJsonProtocol{
                     "avg" -> obj.avg.toJson,
                     "count" -> obj.count.toJson,
                     "duration" -> obj.duration.toJson,
-                    "duration_end" -> myUtils.DateUtils.format(obj.duration_end,"yyyy-MM-dd'T'HH:mm:ss"),
-                    "duration_start" -> myUtils.DateUtils.format(obj.duration_start,"yyyy-MM-dd'T'HH:mm:ss"),
+                    "duration_end" -> DateUtils.format(obj.duration_end,"yyyy-MM-dd'T'HH:mm:ss"),
+                    "duration_start" -> DateUtils.format(obj.duration_start,"yyyy-MM-dd'T'HH:mm:ss"),
                     "max" -> obj.max.toJson,
                     "min" -> obj.min.toJson,
                     "period" -> obj.period.toJson,
-                    "period_end" -> myUtils.DateUtils.format(obj.period_end,"yyyy-MM-dd'T'HH:mm:ss"),
-                    "period_start" -> myUtils.DateUtils.format(obj.period_start,"yyyy-MM-dd'T'HH:mm:ss"),
+                    "period_end" -> DateUtils.format(obj.period_end,"yyyy-MM-dd'T'HH:mm:ss"),
+                    "period_start" -> DateUtils.format(obj.period_start,"yyyy-MM-dd'T'HH:mm:ss"),
                     "sum" -> obj.sum.toJson,
                     "unit" -> obj.unit.toJson)
 
@@ -149,13 +150,13 @@ object JsonConversions extends spray.json.DefaultJsonProtocol{
           "avg" -> obj.avg.toJson,
           "count" -> obj.count.toJson,
           "duration" -> obj.duration.toJson,
-          "duration_end" -> myUtils.DateUtils.format(obj.duration_end,"yyyy-MM-dd'T'HH:mm:ss").toJson,
-          "duration_start" -> myUtils.DateUtils.format(obj.duration_start,"yyyy-MM-dd'T'HH:mm:ss").toJson,
+          "duration_end" -> DateUtils.format(obj.duration_end,"yyyy-MM-dd'T'HH:mm:ss").toJson,
+          "duration_start" -> DateUtils.format(obj.duration_start,"yyyy-MM-dd'T'HH:mm:ss").toJson,
           "max" -> obj.max.toJson,
           "min" -> obj.min.toJson,
           "period" -> obj.period.toJson,
-          "period_end" -> myUtils.DateUtils.format(obj.period_end,"yyyy-MM-dd'T'HH:mm:ss").toJson,
-          "period_start" -> myUtils.DateUtils.format(obj.period_start,"yyyy-MM-dd'T'HH:mm:ss").toJson,
+          "period_end" -> DateUtils.format(obj.period_end,"yyyy-MM-dd'T'HH:mm:ss").toJson,
+          "period_start" -> DateUtils.format(obj.period_start,"yyyy-MM-dd'T'HH:mm:ss").toJson,
           "sum" -> obj.sum.toJson,
           "unit" -> obj.unit.toJson)
       else
@@ -163,13 +164,13 @@ object JsonConversions extends spray.json.DefaultJsonProtocol{
           "avg" -> obj.avg.toJson,
           "count" -> obj.count.toJson,
           "duration" -> obj.duration.toJson,
-          "duration_end" -> myUtils.DateUtils.format(obj.duration_end,"yyyy-MM-dd'T'HH:mm:ss").toJson,
-          "duration_start" -> myUtils.DateUtils.format(obj.duration_start,"yyyy-MM-dd'T'HH:mm:ss").toJson,
+          "duration_end" -> DateUtils.format(obj.duration_end,"yyyy-MM-dd'T'HH:mm:ss").toJson,
+          "duration_start" -> DateUtils.format(obj.duration_start,"yyyy-MM-dd'T'HH:mm:ss").toJson,
           "max" -> obj.max.toJson,
           "min" -> obj.min.toJson,
           "period" -> obj.period.toJson,
-          "period_end" -> myUtils.DateUtils.format(obj.period_end,"yyyy-MM-dd'T'HH:mm:ss").toJson,
-          "period_start" -> myUtils.DateUtils.format(obj.period_start,"yyyy-MM-dd'T'HH:mm:ss").toJson,
+          "period_end" -> DateUtils.format(obj.period_end,"yyyy-MM-dd'T'HH:mm:ss").toJson,
+          "period_start" -> DateUtils.format(obj.period_start,"yyyy-MM-dd'T'HH:mm:ss").toJson,
           "sum" -> obj.sum.toJson,
           "unit" -> obj.unit.toJson,
           "groupby" -> obj.groupby.get.toJson)

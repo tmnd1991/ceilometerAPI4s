@@ -9,6 +9,7 @@ import org.scalatest._
 
 import spray.json._
 
+import it.unibo.ing.utils._
 import org.openstack.api.restful.ceilometer.v2.elements._
 import org.openstack.api.restful.ceilometer.v2.elements.JsonConversions._
 import org.openstack.api.restful.keystone.v2.responses.JsonConversions._
@@ -92,11 +93,11 @@ class JsonTests extends FlatSpec with Matchers {
     parsedOldSample.counter_volume should be (1.0)
     parsedOldSample.message_id should be ("5460acce-4fd6-480d-ab18-9735ec7b1996")
     parsedOldSample.project_id should be ("35b17138-b364-4e6a-a131-8f3099c5be68")
-    myUtils.TimestampUtils.format(parsedOldSample.recorded_at) should be ("2014-10-20T18:40:41.883960")
+    TimestampUtils.format(parsedOldSample.recorded_at) should be ("2014-10-20T18:40:41.883960")
     parsedOldSample.resource_id should be ("bd9431c1-8d69-4ad3-803a-8d4a6b89fd36")
     parsedOldSample.resource_metadata should be (Map("name1"->"value1","name2"->"value2"))
     parsedOldSample.source should be ("openstack")
-    myUtils.TimestampUtils.format(parsedOldSample.timestamp) should be ("2014-10-20T18:40:41.883967")
+    TimestampUtils.format(parsedOldSample.timestamp) should be ("2014-10-20T18:40:41.883967")
     parsedOldSample.user_id should be ("efd87807-12d2-4b38-9c70-5f5c2ac427ff")
   }
   "A Sample" should "be mapped correctly" in{
@@ -122,10 +123,10 @@ class JsonTests extends FlatSpec with Matchers {
     parsedSample.metadata should be (Map("name1"-> "value1", "name2"->"value2"))
     parsedSample.meter should be ("instance")
     parsedSample.project_id should be ("35b17138-b364-4e6a-a131-8f3099c5be68")
-    myUtils.TimestampUtils.format(parsedSample.recorded_at) should be ("2014-10-20T18:40:41.976617")
+    TimestampUtils.format(parsedSample.recorded_at) should be ("2014-10-20T18:40:41.976617")
     parsedSample.resource_id should be ("bd9431c1-8d69-4ad3-803a-8d4a6b89fd36")
     parsedSample.source should be ("openstack")
-    myUtils.TimestampUtils.format(parsedSample.timestamp) should be ("2014-10-20T18:40:41.976606")
+    TimestampUtils.format(parsedSample.timestamp) should be ("2014-10-20T18:40:41.976606")
     parsedSample.`type` should be (MeterType.values("gauge"))
     parsedSample.unit should be ("instance")
     parsedSample.user_id should be ("efd87807-12d2-4b38-9c70-5f5c2ac427ff")
@@ -150,13 +151,13 @@ class JsonTests extends FlatSpec with Matchers {
     statisticsSample.avg should be (4.5)
     statisticsSample.count should be (10)
     statisticsSample.duration should be (300.0)
-    myUtils.DateUtils.format(statisticsSample.duration_end,"yyyy-MM-dd'T'HH:mm:ss") should be ("2013-01-04T16:47:00")
-    myUtils.DateUtils.format(statisticsSample.duration_start,"yyyy-MM-dd'T'HH:mm:ss") should be ("2013-01-04T16:42:00")
+    DateUtils.format(statisticsSample.duration_end,"yyyy-MM-dd'T'HH:mm:ss") should be ("2013-01-04T16:47:00")
+    DateUtils.format(statisticsSample.duration_start,"yyyy-MM-dd'T'HH:mm:ss") should be ("2013-01-04T16:42:00")
     statisticsSample.max should be (9.0)
     statisticsSample.min should be (1.0)
     statisticsSample.period should be (7200)
-    myUtils.DateUtils.format(statisticsSample.period_end,"yyyy-MM-dd'T'HH:mm:ss") should be ("2013-01-04T18:00:00")
-    myUtils.DateUtils.format(statisticsSample.period_start,"yyyy-MM-dd'T'HH:mm:ss") should be ("2013-01-04T16:00:00")
+    DateUtils.format(statisticsSample.period_end,"yyyy-MM-dd'T'HH:mm:ss") should be ("2013-01-04T18:00:00")
+    DateUtils.format(statisticsSample.period_start,"yyyy-MM-dd'T'HH:mm:ss") should be ("2013-01-04T16:00:00")
     statisticsSample.sum should be (45.0)
     statisticsSample.unit should be ("GiB")
   }

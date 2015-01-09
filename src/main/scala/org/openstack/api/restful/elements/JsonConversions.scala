@@ -3,8 +3,8 @@ package org.openstack.api.restful.elements
 import java.util.Date
 
 import spray.json._
-import myUtils.DateUtils
-import myUtils.URLJsonConversion._
+import it.unibo.ing.utils.DateUtils
+import spray.json.URLConversion._
 import org.openstack.api.restful.MalformedJsonException
 /**
  * @author Antonio Murgia

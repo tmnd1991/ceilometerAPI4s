@@ -1,6 +1,6 @@
 package org.openstack.api.restful.ceilometer.v2.FilterExpressions
 
-import myUtils.DateUtils
+import it.unibo.ing.utils.DateUtils
 import org.openstack.api.restful.ceilometer.v2.FilterExpressions.ComplexQueryPackage.ComplexQuery
 import org.openstack.api.restful.ceilometer.v2.FilterExpressions.ComplexQueryPackage.JsonConversions.ComplexQueryJsonFormat
 import org.openstack.api.restful.ceilometer.v2.FilterExpressions.SimpleQueryPackage.JsonConversions.SimpleQueryJsonFormat

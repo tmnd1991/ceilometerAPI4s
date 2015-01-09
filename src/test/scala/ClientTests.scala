@@ -2,11 +2,14 @@
 
 import java.util.Date
 
-import myUtils.DateUtils
+import it.unibo.ing.utils._
 import org.openstack.api.restful.ceilometer.v2.FilterExpressions.SimpleQueryPackage.Goodies._
 import org.openstack.api.restful.ceilometer.v2.FilterExpressions.FieldValue._
 import org.openstack.api.restful.ceilometer.v2.elements.{Resource, Meter}
 import org.scalatest._
+
+import scala.collection.IterableLike
+import scala.collection.generic.CanBuildFrom
 
 /**
  * Created by tmnd on 26/11/14.
@@ -41,9 +44,44 @@ class ClientTests extends FlatSpec with Matchers{
   }
 
   "there " should " be some samples about resources in the last 10 hours" in {
-    val samples = client.tryGetSamplesOfResource(resources.get.head.resource_id, new Date(new Date().getTime - 36000000), new Date())
-    samples should not be None
-    samples.get.isEmpty should be (false)
-    println(s"there are ${samples.get.size} samples")
+    val samples1 = client.tryGetSamplesOfResource(resources.get.head.resource_id, new Date(new Date().getTime - 36000000), new Date())
+    val samples2 = client.tryGetSamplesOfMeter(meters.get.head.name, new Date(new Date().getTime - 36000000), new Date())
+    samples1 should not be None
+    samples1.get.isEmpty should be (false)
+    samples2 should not be None
+    samples2.get.isEmpty should be (false)
+    for (s <- samples1.get.distinctBy(_.meter))
+      println(s.meter)
+    /*
+    println(s"there are ${samples1.get.size} samples")
+    println(s"there are ${samples2.get.size} samples")
+    println("avaiable resources :")
+    println("-----------------------------------")
+    for(r <- resources.get)
+      println(r.resource_id + " " + r.links)
+    println("-----------------------------------")
+    println("avaiable meters :")
+    println("-----------------------------------")
+    for(r <- meters.get.distinctBy(_.name))
+      println(r.name + " " + r.`type`)
+    println("-----------------------------------")
+    */
+  }
+
+  implicit class RichCollection[A, Repr](xs: IterableLike[A, Repr]){
+    def distinctBy[B, That](f: A => B)(implicit cbf: CanBuildFrom[Repr, A, That]) = {
+      val builder = cbf(xs.repr)
+      val i = xs.iterator
+      var set = Set[B]()
+      while (i.hasNext) {
+        val o = i.next
+        val b = f(o)
+        if (!set(b)) {
+          set += b
+          builder += o
+        }
+      }
+      builder.result
+    }
   }
 }
