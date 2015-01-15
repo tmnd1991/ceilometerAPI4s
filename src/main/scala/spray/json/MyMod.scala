@@ -6,7 +6,7 @@ package spray.json
  * @version 27/11/14
  */
 object MyMod {
-  implicit class pimpedString(s : String){
+  implicit class pimpedString(val s : String) extends AnyVal{
     import spray.json._
 
     /**
@@ -21,7 +21,7 @@ object MyMod {
       }
     }
   }
-  implicit class pimpedJson(json : spray.json.JsValue){
+  implicit class pimpedJson(val json : spray.json.JsValue) extends AnyVal{
     /**
      * @tparam T the class to the json has to be converted to
      * @return Some instance of class T or None if an error occurs
