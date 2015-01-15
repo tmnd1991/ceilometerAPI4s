@@ -6,8 +6,7 @@ package org.openstack.api.restful.ceilometer.v2.FilterExpressions.ComplexQueryPa
  * @author Antonio Murgia
  * @version 18/10/14
  */
-abstract class SimpleOperator(val s : String){
-}
+abstract class SimpleOperator(val s : String) extends Serializable
 object SimpleOperator{
   val values = Map(Equals.s -> Equals,
                    NotEquals.s -> NotEquals,

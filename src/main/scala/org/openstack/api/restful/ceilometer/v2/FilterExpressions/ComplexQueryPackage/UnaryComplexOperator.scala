@@ -6,8 +6,8 @@ package org.openstack.api.restful.ceilometer.v2.FilterExpressions.ComplexQueryPa
  * @author Antonio Murgia
  * @version 18/10/14
  */
-class UnaryComplexOperator(val s : String)
+class UnaryComplexOperator(val s : String) extends Serializable
 object UnaryComplexOperator{
-  val values = Map("not" -> NotOperator)
+  val values = Map(NotOperator.s -> NotOperator)
   object NotOperator extends UnaryComplexOperator("not")
 }

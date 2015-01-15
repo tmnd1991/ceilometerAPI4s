@@ -4,9 +4,8 @@ package org.openstack.api.restful.keystone.v2.elements
  * @author Antonio Murgia
  * @version 09/11/14
  */
-abstract class OpenStackEndpointType(val value : String) {
+abstract class OpenStackEndpointType(val value : String) extends Serializable
 
-}
 object OpenStackEndpointType {
   val values = Map(COMPUTE.value -> COMPUTE,
                    S3.value -> S3,

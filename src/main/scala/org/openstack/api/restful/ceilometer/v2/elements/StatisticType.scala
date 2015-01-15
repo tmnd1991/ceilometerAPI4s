@@ -5,9 +5,7 @@ package org.openstack.api.restful.ceilometer.v2.elements
  * @author Antonio Murgia
  * @version 22/10/14
  */
-class StatisticType(val s : String) {
-
-}
+class StatisticType(val s : String) extends Serializable
 object StatisticType{
   val values = Map(MAX.s -> MAX,
                    MIN.s -> MIN,

@@ -6,7 +6,7 @@ package org.openstack.api.restful.ceilometer.v2.FilterExpressions.ComplexQueryPa
  * @author Antonio Murgia
  * @version 18/10/14
  */
-abstract class Order(val s : String)
+abstract class Order(val s : String) extends Serializable
 object Order{
   val values = Map(ASC.s->ASC,
                   DESC.s -> DESC)

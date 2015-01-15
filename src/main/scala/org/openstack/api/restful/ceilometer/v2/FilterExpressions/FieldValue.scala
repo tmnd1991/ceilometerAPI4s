@@ -1,5 +1,7 @@
 package org.openstack.api.restful.ceilometer.v2.FilterExpressions
 
+import java.util.Date
+
 /**
  * class that wraps booleans, integer, floats, string and dates that are the only values permitted
  * in a ceilometer query

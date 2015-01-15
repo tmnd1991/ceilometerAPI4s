@@ -5,7 +5,7 @@ package org.openstack.api.restful.ceilometer.v2.elements
  * @author Antonio Murgia
  * @version 22/10/14
  */
-class AlarmChangeType(val s : String)
+class AlarmChangeType(val s : String) extends Serializable
 object AlarmChangeType{
   val values = Map(CREATION.s -> CREATION,
                    RULECHANGE.s -> RULECHANGE,

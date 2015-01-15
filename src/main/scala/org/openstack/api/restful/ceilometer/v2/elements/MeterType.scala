@@ -5,7 +5,7 @@ package org.openstack.api.restful.ceilometer.v2.elements
  * @author Antonio Murgia
  * @version 22/10/14
  */
-class MeterType(val s : String){
+abstract class MeterType(val s : String) extends Serializable{
   override def toString = s
 }
 object MeterType{
