@@ -37,6 +37,7 @@ private class KeystoneTokenProvider(host : URL, tenantName : String,  username :
   client.start
 
   private val tokens : mutable.Map[Int, TokenInfo] = mutable.Map()
+  private var _timeOffset : Option[Long] = None
 
   override def invalidate = {
     this.synchronized{
@@ -53,6 +54,10 @@ private class KeystoneTokenProvider(host : URL, tenantName : String,  username :
       tokens(hash).id
     }
   }
+
+  override def timeOffset = if (_timeOffset.isDefined) _timeOffset.get
+                            else throw new RuntimeException("timeOffset not set")
+
 
   /**
    *
@@ -71,10 +76,10 @@ private class KeystoneTokenProvider(host : URL, tenantName : String,  username :
 
     val body = response.getContentAsString
     val tokenResponse = body.parseJson.convertTo[TokenResponse]
-
+    _timeOffset = Some(tokenResponse.access.token.issued_at - new Date())
     new TokenInfo(tokenResponse.access.token.id,
                   new Date(),
-                  tokenResponse.access.token.expires.getTime - tokenResponse.access.token.issued_at.getTime)
+                  tokenResponse.access.token.expires - tokenResponse.access.token.issued_at)
   }
 
   private def isExpired(hash : Int) = {

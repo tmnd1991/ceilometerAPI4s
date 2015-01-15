@@ -61,6 +61,8 @@ trait ICeilometerClient {
    */
   def shutdown()
 
+  def timeOffset : Long
+
   //region syntactic sugar
   /**
    * @return Some collection of meters avaiable if an error occurs returns None

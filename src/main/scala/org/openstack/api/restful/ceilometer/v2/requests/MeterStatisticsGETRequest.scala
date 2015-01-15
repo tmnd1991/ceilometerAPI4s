@@ -2,7 +2,7 @@ package org.openstack.api.restful.ceilometer.v2.requests
 
 import org.openstack.api.restful.ceilometer.v2.FilterExpressions.Query
 import org.openstack.api.restful.ceilometer.v2.elements.{Meter, Aggregate}
-
+import it.unibo.ing.utils._
 
 /**
  * @author Antonio Murgia
@@ -13,7 +13,7 @@ case class MeterStatisticsGETRequest(meter_name : String,
                                      groupby : Seq[String] = Seq.empty,
                                      period : Option[Int] = None,
                                      aggregate : Seq[Aggregate] = Seq.empty){
-  lazy val relativeURL = "/v2/meters/" + meter_name + "/statistics"
+  def relativeURL = "/v2/meters/" / meter_name / "statistics"
 }
 object MeterStatisticsGETRequestJsonProtocol extends spray.json.DefaultJsonProtocol {
   import spray.json._

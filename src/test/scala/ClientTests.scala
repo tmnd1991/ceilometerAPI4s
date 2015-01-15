@@ -31,8 +31,8 @@ class ClientTests extends FlatSpec with Matchers{
     println(s"there are ${meters.get.size} meters")
   }
 
-  "there " should " be some statistics about meters in the last 10 hours" in {
-    val stats = client.tryGetStatistics(meters.get.head.name, new Date(new Date().getTime - 36000000), new Date())
+  "there " should " be some statistics about meters in the last 1 hour" in {
+    val stats = client.tryGetStatistics(meters.get.head.name, new Date(new Date().getTime - 3600000), new Date())
     stats should not be None
     stats.get.isEmpty should be (false)
   }
@@ -43,9 +43,13 @@ class ClientTests extends FlatSpec with Matchers{
     println(s"there are ${resources.get.size} resources")
   }
 
-  "there " should " be some samples about resources in the last 10 hours" in {
-    val samples1 = client.tryGetSamplesOfResource(resources.get.head.resource_id, new Date(new Date().getTime - 36000000), new Date())
-    val samples2 = client.tryGetSamplesOfMeter(meters.get.head.name, new Date(new Date().getTime - 36000000), new Date())
+  "there " should " be some samples about resources in the last 1 hour" in {
+    val start = new Date((new Date().getTime - 3600000))
+    val end = new Date(start.getTime + 3600000)
+    println("start " + start)
+    println("end " + end)
+    val samples1 = client.tryGetSamplesOfResource(resources.get.head.resource_id, start, end)
+    val samples2 = client.tryGetSamplesOfMeter(meters.get.head.name, start, end)
     samples1 should not be None
     samples1.get.isEmpty should be (false)
     samples2 should not be None

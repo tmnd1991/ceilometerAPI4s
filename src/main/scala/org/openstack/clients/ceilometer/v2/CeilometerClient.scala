@@ -30,6 +30,8 @@ import org.openstack.api.restful.ceilometer.v2.requests.MeterStatisticsGETReques
 import org.openstack.api.restful.ceilometer.v2.elements.JsonConversions._
 import org.openstack.api.restful.keystone.v2.KeystoneTokenProvider
 
+import it.unibo.ing.utils._
+
 /**
  * High level object that offers services to query a ceilometer endpoint
  * @author Antonio Murgia
@@ -64,15 +66,15 @@ class CeilometerClient(ceilometerUrl : URL,
       request.toJson.compactPrint
     tokenProvider.tokenOption match{
       case Some(s : String) => {
-        val uri = new URL(ceilometerUrl.toString + request.relativeURL).toURI
-        val resp = httpClient.newRequest(uri).
-          method(HttpMethod.GET).
-          header("Content-Type","application/json").
-          header("X-Auth-Token",s).
-          content(new StringContentProvider(body)).
-          timeout(readTimeout, TimeUnit.MILLISECONDS).
-          send()
         try{
+          val uri = new URL(ceilometerUrl.toString + request.relativeURL).toURI
+          val resp = httpClient.newRequest(uri).
+            method(HttpMethod.GET).
+            header("Content-Type","application/json").
+            header("X-Auth-Token",s).
+            content(new StringContentProvider(body)).
+            timeout(readTimeout, TimeUnit.MILLISECONDS).
+            send()
           val json = resp.getContentAsString.tryParseJson
           if (json != None){
             import spray.json.DefaultJsonProtocol._
@@ -90,135 +92,162 @@ class CeilometerClient(ceilometerUrl : URL,
   }
 
   override def tryGetStatistics(meterName : String) : Option[Seq[Statistics]] = {
-    val uri = new URL(ceilometerUrl.toString + "/v2/meters/" + meterName + "/statistics").toURI
-    tokenProvider.tokenOption match{
-      case Some(s : String) => {
-        val resp = httpClient.newRequest(uri).
-          method(HttpMethod.GET).
-          header("X-Auth-Token",s).
-          timeout(readTimeout, TimeUnit.MILLISECONDS).
-          send
-        val body = resp.getContentAsString
-        val json = body.tryParseJson
-        if (json != None) {
-          import spray.json.DefaultJsonProtocol._
-          val result = json.get.tryConvertTo[List[Statistics]]
-          result
+    try{
+      val uri = new URL(ceilometerUrl.toString / "/v2/meters/" / meterName / "/statistics").toURI
+      tokenProvider.tokenOption match{
+        case Some(s : String) => {
+          val resp = httpClient.newRequest(uri).
+            method(HttpMethod.GET).
+            header("X-Auth-Token",s).
+            timeout(readTimeout, TimeUnit.MILLISECONDS).
+            send
+          val body = resp.getContentAsString
+          val json = body.tryParseJson
+          if (json != None) {
+            import spray.json.DefaultJsonProtocol._
+            val result = json.get.tryConvertTo[List[Statistics]]
+            result
+          }
+          else None
         }
-        else None
+        case _ => None
       }
-      case _ => None
+    }
+    catch{
+      case _ : Throwable => None
     }
   }
 
   override def tryGetStatistics(meterName : String, from : Date, to : Date) : Option[Seq[Statistics]] = {
-    if (to before from) None
-    else{
-      import org.openstack.api.restful.ceilometer.v2.FilterExpressions.SimpleQueryPackage.Goodies._
-      val queries = List(("timestamp" >>>> from),("timestamp" <<== to))
-      val request = MeterStatisticsGETRequest(meterName, queries)
-      val body = request.toJson.toString
-      val uri = new URL(ceilometerUrl.toString + request.relativeURL).toURI
-      tokenProvider.tokenOption match{
-        case Some(s : String) => {
-          val resp = httpClient.newRequest(uri).
-            method(HttpMethod.GET).
-            header("X-Auth-Token",s).
-            header("Content-Type","application/json").
-            content(new StringContentProvider(body)).
-            timeout(readTimeout, TimeUnit.MILLISECONDS).
-            send
-          val json = resp.getContentAsString.tryParseJson
-          if (json != None) {
-            import spray.json.DefaultJsonProtocol._
-            json.get.tryConvertTo[List[Statistics]]
+    try{
+      if (to before from) None
+      else{
+        import org.openstack.api.restful.ceilometer.v2.FilterExpressions.SimpleQueryPackage.Goodies._
+        val queries = List(("timestamp" >>>> from),("timestamp" <<== to))
+        val request = MeterStatisticsGETRequest(meterName, queries)
+        val body = request.toJson.toString
+        val uri = new URL(ceilometerUrl.toString + request.relativeURL).toURI
+        tokenProvider.tokenOption match{
+          case Some(s : String) => {
+            val resp = httpClient.newRequest(uri).
+              method(HttpMethod.GET).
+              header("X-Auth-Token",s).
+              header("Content-Type","application/json").
+              content(new StringContentProvider(body)).
+              timeout(readTimeout, TimeUnit.MILLISECONDS).
+              send
+            val json = resp.getContentAsString.tryParseJson
+            if (json != None) {
+              import spray.json.DefaultJsonProtocol._
+              json.get.tryConvertTo[List[Statistics]]
+            }
+            else None
           }
-          else None
+          case _ => None
         }
-        case _ => None
       }
+    }
+    catch{
+      case _ : Throwable => None
     }
   }
 
   override def tryGetSamplesOfMeter(meterName : String, from : Date, to : Date) : Option[Seq[OldSample]] = {
-    if (to before from) None
-    else{
-      import org.openstack.api.restful.ceilometer.v2.FilterExpressions.SimpleQueryPackage.Goodies._
-      val queries = List(("timestamp" >>>> from),("timestamp" <<== to))
-      val request = MeterGETRequest(meterName, Some(queries), responseBufferSize/sample_size)
-      val uri = new URL(ceilometerUrl.toString + request.relativeURL).toURI
-      tokenProvider.tokenOption match{
-        case Some(s : String) => {
-          val body = request.toJson.compactPrint
-          val resp = httpClient.newRequest(uri).
-            method(HttpMethod.GET).
-            header("X-Auth-Token",s).
-            header("Content-Type","application/json").
-            content(new StringContentProvider(body)).
-            timeout(readTimeout, TimeUnit.MILLISECONDS).
-            send
-          val json = resp.getContentAsString.tryParseJson
-          if (json.isDefined) {
-            import spray.json.DefaultJsonProtocol._
-            json.get.tryConvertTo[List[OldSample]]
+    try{
+      if (to before from) None
+      else{
+        import org.openstack.api.restful.ceilometer.v2.FilterExpressions.SimpleQueryPackage.Goodies._
+        val queries = List(("timestamp" >>>> from),("timestamp" <<== to))
+        val request = MeterGETRequest(meterName, Some(queries), responseBufferSize/sample_size)
+        val uri = new URL(ceilometerUrl.toString + request.relativeURL).toURI
+        tokenProvider.tokenOption match{
+          case Some(s : String) => {
+            val body = request.toJson.compactPrint
+            val resp = httpClient.newRequest(uri).
+              method(HttpMethod.GET).
+              header("X-Auth-Token",s).
+              header("Content-Type","application/json").
+              content(new StringContentProvider(body)).
+              timeout(readTimeout, TimeUnit.MILLISECONDS).
+              send
+            val json = resp.getContentAsString.tryParseJson
+            if (json.isDefined) {
+              import spray.json.DefaultJsonProtocol._
+              json.get.tryConvertTo[List[OldSample]]
+            }
+            else None
           }
-          else None
+          case _ => None
         }
-        case _ => None
       }
+    }
+    catch{
+      case _ : Throwable => None
     }
   }
 
 
   override def tryGetSamplesOfResource(resource_id : String, from : Date, to :Date) : Option[Seq[Sample]] = {
-    if (to before from) None
-    else{
-      import org.openstack.api.restful.ceilometer.v2.requests.SamplesGETRequestJsonConversion._
-      import org.openstack.api.restful.ceilometer.v2.FilterExpressions.SimpleQueryPackage.Goodies._
-      val queries = List(("timestamp" >>>> from),("timestamp" <<== to),("resource_id" ==== resource_id))
-      val request = SamplesGETRequest(Some(queries), responseBufferSize / sample_size)
-      val uri = new URL(ceilometerUrl.toString + request.relativeURL).toURI
+    try{
+      if (to before from) None
+      else{
+        import org.openstack.api.restful.ceilometer.v2.requests.SamplesGETRequestJsonConversion._
+        import org.openstack.api.restful.ceilometer.v2.FilterExpressions.SimpleQueryPackage.Goodies._
+        val queries = List(("timestamp" >>>> from),("timestamp" <<== to),("resource_id" ==== resource_id))
+        val request = SamplesGETRequest(Some(queries), responseBufferSize / sample_size)
+        val uri = new URL(ceilometerUrl.toString + request.relativeURL).toURI
+        tokenProvider.tokenOption match{
+          case Some(s : String) => {
+            val body = request.toJson.compactPrint
+            val resp = httpClient.newRequest(uri).
+              method(HttpMethod.GET).
+              header("X-Auth-Token",s).
+              header("Content-Type","application/json").
+              content(new StringContentProvider(body)).
+              timeout(readTimeout, TimeUnit.MILLISECONDS).
+              send
+            val json = resp.getContentAsString.tryParseJson
+            if (json.isDefined) {
+              import spray.json.DefaultJsonProtocol._
+              json.get.tryConvertTo[List[Sample]]
+            }
+            else None
+          }
+          case _ => None
+        }
+      }
+    }
+    catch{
+      case _ : Throwable => None
+    }
+  }
+
+  override def timeOffset = tokenProvider.timeOffset
+
+  override def tryListResources(queries : Seq[Query]) : Option[Seq[Resource]] = {
+    try{
+      val req = ResourcesListGETRequest(queries)
+      val uri = new URL(ceilometerUrl.toString + req.relativeURL).toURI
       tokenProvider.tokenOption match{
         case Some(s : String) => {
-          val body = request.toJson.compactPrint
           val resp = httpClient.newRequest(uri).
             method(HttpMethod.GET).
             header("X-Auth-Token",s).
-            header("Content-Type","application/json").
-            content(new StringContentProvider(body)).
             timeout(readTimeout, TimeUnit.MILLISECONDS).
             send
           val json = resp.getContentAsString.tryParseJson
           if (json.isDefined) {
             import spray.json.DefaultJsonProtocol._
-            json.get.tryConvertTo[List[Sample]]
+            json.get.convertTo[List[Resource]]
+            json.get.tryConvertTo[List[Resource]]
           }
           else None
         }
         case _ => None
       }
     }
-  }
-
-  override def tryListResources(queries : Seq[Query]) : Option[Seq[Resource]] = {
-    val req = ResourcesListGETRequest(queries)
-    val uri = new URL(ceilometerUrl.toString + req.relativeURL).toURI
-    tokenProvider.tokenOption match{
-      case Some(s : String) => {
-        val resp = httpClient.newRequest(uri).
-          method(HttpMethod.GET).
-          header("X-Auth-Token",s).
-          timeout(readTimeout, TimeUnit.MILLISECONDS).
-          send
-        val json = resp.getContentAsString.tryParseJson
-        if (json.isDefined) {
-          import spray.json.DefaultJsonProtocol._
-          json.get.convertTo[List[Resource]]
-          json.get.tryConvertTo[List[Resource]]
-        }
-        else None
-      }
-      case _ => None
+    catch{
+      case _ : Throwable => None
     }
   }
 
@@ -238,8 +267,8 @@ object CeilometerClient{
       val hashcode = getHashCode(ceilometerUrl,keystoneUrl,tenantName,username,password)
       if (!instances.contains(hashCode))
         instances(hashCode) = new CeilometerClient(ceilometerUrl, keystoneUrl, tenantName,  username, password, connectTimeout, readTimeout)
-      instances(hashCode)
     }
+    instances(hashCode)
   }
   private def getHashCode(vals : Any*) = vals.mkString("").hashCode
 }

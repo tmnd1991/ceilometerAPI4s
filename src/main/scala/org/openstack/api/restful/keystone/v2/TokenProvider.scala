@@ -18,6 +18,8 @@ trait TokenProvider extends Serializable{
    * invalidates the current token
    */
   def invalidate : Unit
+
+  def timeOffset : Long
   /**
    * @return Some Token or None if an error occurs
    */
