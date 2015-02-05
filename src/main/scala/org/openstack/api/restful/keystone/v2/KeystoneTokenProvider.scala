@@ -4,8 +4,7 @@ import java.net.URL
 import java.util.Date
 import it.unibo.ing.utils._
 import org.eclipse.jetty.client._
-import org.eclipse.jetty.client.util.StringContentProvider
-import org.eclipse.jetty.http.HttpMethod
+import org.eclipse.jetty.io.{ByteArrayBuffer, Buffer}
 
 import org.openstack.api.restful.keystone.v2.elements.{PasswordCredential, OpenStackCredential}
 import org.openstack.api.restful.keystone.v2.requests.TokenPOSTRequest
@@ -69,12 +68,22 @@ private class KeystoneTokenProvider(host : URL, tenantName : String,  username :
     val aString = a.toJson.toString
     val url = new URL(host.toString + a.relativeURL).toURI
 
-    val request = client.POST(url).
+    val exchange = new ContentExchange()
+    exchange.setMethod("POST")
+    exchange.setRequestContentType("application/json")
+    exchange.setRequestContent(new ByteArrayBuffer(aString.getBytes))
+    exchange.setURI(url)
+    client.send(exchange)
+      /*POST(url).
       header("Content-Type","application/json").
       content(new StringContentProvider(aString))
+      */
+    val exchangeState = exchange.waitForDone()
+    val body = exchange.getResponseContent
+    /*
     val response = request.send()
-
     val body = response.getContentAsString
+    */
     val tokenResponse = body.parseJson.convertTo[TokenResponse]
     _timeOffset = Some(tokenResponse.access.token.issued_at - new Date())
     new TokenInfo(tokenResponse.access.token.id,

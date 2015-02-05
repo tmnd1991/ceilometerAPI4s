@@ -32,7 +32,10 @@ class ClientTests extends FlatSpec with Matchers{
   }
 
   "there " should " be some statistics about meters in the last 1 hour" in {
-    val stats = client.tryGetStatistics(meters.get.head.name, new Date(new Date().getTime - 3600000), new Date())
+    val theMeter = meters.get.head.name
+    val startDate = new Date(new Date().getTime - 3600000)
+    val endDate = new Date()
+    val stats = client.tryGetStatistics(theMeter, startDate, endDate)
     stats should not be None
     stats.get.isEmpty should be (false)
   }

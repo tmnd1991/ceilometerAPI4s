@@ -5,12 +5,11 @@ import java.util.Date
 import java.util.concurrent.TimeUnit
 
 
+import org.eclipse.jetty.io.ByteArrayBuffer
 import spray.json._
 import spray.json.MyMod._
 
-import org.eclipse.jetty.client.HttpClient
-import org.eclipse.jetty.client.util.StringContentProvider
-import org.eclipse.jetty.http.HttpMethod
+import org.eclipse.jetty.client.{ContentExchange, HttpClient}
 
 import org.openstack.api.restful.ceilometer.v2.FilterExpressions.ComplexQueryPackage._
 import org.openstack.api.restful.ceilometer.v2.FilterExpressions.Query
@@ -51,8 +50,7 @@ class CeilometerClient(ceilometerUrl : URL,
   private val tokenProvider = KeystoneTokenProvider.getInstance(keystoneUrl, tenantName, username, password)
   private val httpClient = new HttpClient()
   httpClient.setConnectTimeout(connectTimeout)
-  httpClient.setFollowRedirects(false)
-  httpClient.setStopTimeout(readTimeout)
+  httpClient.setMaxRedirects(1)
   httpClient.setRequestBufferSize(requestBufferSize)
   httpClient.setResponseBufferSize(responseBufferSize)
   httpClient.start()
@@ -68,14 +66,15 @@ class CeilometerClient(ceilometerUrl : URL,
       case Some(s : String) => {
         try{
           val uri = new URL(ceilometerUrl.toString + request.relativeURL).toURI
-          val resp = httpClient.newRequest(uri).
-            method(HttpMethod.GET).
-            header("Content-Type","application/json").
-            header("X-Auth-Token",s).
-            content(new StringContentProvider(body)).
-            timeout(readTimeout, TimeUnit.MILLISECONDS).
-            send()
-          val json = resp.getContentAsString.tryParseJson
+          val exchange = new ContentExchange()
+          exchange.setURI(uri)
+          exchange.setMethod("GET")
+          exchange.setRequestHeader("X-Auth-Token",s)
+          exchange.setRequestContentType("application/json")
+          exchange.setTimeout(readTimeout)
+          httpClient.send(exchange)
+          val state = exchange.waitForDone()
+          val json = exchange.getResponseContent.tryParseJson
           if (json != None){
             import spray.json.DefaultJsonProtocol._
             json.get.tryConvertTo[Seq[Meter]]
@@ -96,12 +95,14 @@ class CeilometerClient(ceilometerUrl : URL,
       val uri = new URL(ceilometerUrl.toString / "/v2/meters/" / meterName / "/statistics").toURI
       tokenProvider.tokenOption match{
         case Some(s : String) => {
-          val resp = httpClient.newRequest(uri).
-            method(HttpMethod.GET).
-            header("X-Auth-Token",s).
-            timeout(readTimeout, TimeUnit.MILLISECONDS).
-            send
-          val body = resp.getContentAsString
+          val exchange = new ContentExchange()
+          exchange.setURI(uri)
+          exchange.setRequestHeader("X-Auth-Token",s)
+          exchange.setMethod("GET")
+          exchange.setTimeout(readTimeout)
+          httpClient.send(exchange)
+          val state = exchange.waitForDone()
+          val body = exchange.getResponseContent
           val json = body.tryParseJson
           if (json != None) {
             import spray.json.DefaultJsonProtocol._
@@ -129,14 +130,16 @@ class CeilometerClient(ceilometerUrl : URL,
         val uri = new URL(ceilometerUrl.toString + request.relativeURL).toURI
         tokenProvider.tokenOption match{
           case Some(s : String) => {
-            val resp = httpClient.newRequest(uri).
-              method(HttpMethod.GET).
-              header("X-Auth-Token",s).
-              header("Content-Type","application/json").
-              content(new StringContentProvider(body)).
-              timeout(readTimeout, TimeUnit.MILLISECONDS).
-              send
-            val json = resp.getContentAsString.tryParseJson
+            val exchange = new ContentExchange()
+            exchange.setURI(uri)
+            exchange.setMethod("GET")
+            exchange.setRequestHeader("X-Auth-Token",s)
+            exchange.setRequestContentType("application/json")
+            exchange.setRequestContent(new ByteArrayBuffer(body.getBytes))
+            exchange.setTimeout(readTimeout)
+            httpClient.send(exchange)
+            val state = exchange.waitForDone()
+            val json = exchange.getResponseContent.tryParseJson
             if (json != None) {
               import spray.json.DefaultJsonProtocol._
               json.get.tryConvertTo[List[Statistics]]
@@ -148,7 +151,10 @@ class CeilometerClient(ceilometerUrl : URL,
       }
     }
     catch{
-      case _ : Throwable => None
+      case t : Throwable => {
+        println(t.getMessage)
+        None
+      }
     }
   }
 
@@ -163,14 +169,16 @@ class CeilometerClient(ceilometerUrl : URL,
         tokenProvider.tokenOption match{
           case Some(s : String) => {
             val body = request.toJson.compactPrint
-            val resp = httpClient.newRequest(uri).
-              method(HttpMethod.GET).
-              header("X-Auth-Token",s).
-              header("Content-Type","application/json").
-              content(new StringContentProvider(body)).
-              timeout(readTimeout, TimeUnit.MILLISECONDS).
-              send
-            val json = resp.getContentAsString.tryParseJson
+            val exchange = new ContentExchange()
+            exchange.setURI(uri)
+            exchange.setMethod("GET")
+            exchange.setRequestHeader("X-Auth-Token",s)
+            exchange.setRequestContentType("application/json")
+            exchange.setRequestContent(new ByteArrayBuffer(body.getBytes))
+            exchange.setTimeout(readTimeout)
+            httpClient.send(exchange)
+            val state = exchange.waitForDone()
+            val json = exchange.getResponseContent.tryParseJson
             if (json.isDefined) {
               import spray.json.DefaultJsonProtocol._
               json.get.tryConvertTo[List[OldSample]]
@@ -199,14 +207,16 @@ class CeilometerClient(ceilometerUrl : URL,
         tokenProvider.tokenOption match{
           case Some(s : String) => {
             val body = request.toJson.compactPrint
-            val resp = httpClient.newRequest(uri).
-              method(HttpMethod.GET).
-              header("X-Auth-Token",s).
-              header("Content-Type","application/json").
-              content(new StringContentProvider(body)).
-              timeout(readTimeout, TimeUnit.MILLISECONDS).
-              send
-            val json = resp.getContentAsString.tryParseJson
+            val exchange = new ContentExchange()
+            exchange.setURI(uri)
+            exchange.setMethod("GET")
+            exchange.setRequestHeader("X-Auth-Token",s)
+            exchange.setRequestContentType("application/json")
+            exchange.setRequestContent(new ByteArrayBuffer(body.getBytes))
+            exchange.setTimeout(readTimeout)
+            httpClient.send(exchange)
+            val state = exchange.waitForDone()
+            val json = exchange.getResponseContent.tryParseJson
             if (json.isDefined) {
               import spray.json.DefaultJsonProtocol._
               json.get.tryConvertTo[List[Sample]]
@@ -230,12 +240,14 @@ class CeilometerClient(ceilometerUrl : URL,
       val uri = new URL(ceilometerUrl.toString + req.relativeURL).toURI
       tokenProvider.tokenOption match{
         case Some(s : String) => {
-          val resp = httpClient.newRequest(uri).
-            method(HttpMethod.GET).
-            header("X-Auth-Token",s).
-            timeout(readTimeout, TimeUnit.MILLISECONDS).
-            send
-          val json = resp.getContentAsString.tryParseJson
+          val exchange = new ContentExchange()
+          exchange.setURI(uri)
+          exchange.setMethod("GET")
+          exchange.setRequestHeader("X-Auth-Token",s)
+          exchange.setTimeout(readTimeout)
+          httpClient.send(exchange)
+          val state = exchange.waitForDone()
+          val json = exchange.getResponseContent.tryParseJson
           if (json.isDefined) {
             import spray.json.DefaultJsonProtocol._
             json.get.convertTo[List[Resource]]

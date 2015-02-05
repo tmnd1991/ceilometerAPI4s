@@ -43,10 +43,10 @@ class JsonTests extends FlatSpec with Matchers {
     parsedResource.first_sample_timestamp should be (None)
     parsedResource.last_sample_timestamp should be (None)
     parsedResource.metadata should be (Map("name1"->"value1","name2"->"value2"))
-    parsedResource.project_id should be ("35b17138-b364-4e6a-a131-8f3099c5be68")
+    parsedResource.project_id.get should be ("35b17138-b364-4e6a-a131-8f3099c5be68")
     parsedResource.resource_id should be ("bd9431c1-8d69-4ad3-803a-8d4a6b89fd36")
     parsedResource.source should be ("openstack")
-    parsedResource.user_id should be ("efd87807-12d2-4b38-9c70-5f5c2ac427ff")
+    parsedResource.user_id.get should be ("efd87807-12d2-4b38-9c70-5f5c2ac427ff")
   }
   "A Meter" should  "be mapped correctly" in{
     val parsedMeter = """{
@@ -98,7 +98,7 @@ class JsonTests extends FlatSpec with Matchers {
     parsedOldSample.resource_metadata should be (Map("name1"->"value1","name2"->"value2"))
     parsedOldSample.source should be ("openstack")
     TimestampUtils.format(parsedOldSample.timestamp) should be ("2014-10-20T18:40:41.883967")
-    parsedOldSample.user_id should be ("efd87807-12d2-4b38-9c70-5f5c2ac427ff")
+    parsedOldSample.user_id.get should be ("efd87807-12d2-4b38-9c70-5f5c2ac427ff")
   }
   "A Sample" should "be mapped correctly" in{
     val parsedSample = """{
