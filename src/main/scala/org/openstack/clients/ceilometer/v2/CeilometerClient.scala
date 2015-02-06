@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit
 
 
 import org.eclipse.jetty.io.ByteArrayBuffer
+import org.slf4j.{LoggerFactory, Logger}
 import spray.json._
 import spray.json.MyMod._
 
@@ -54,6 +55,7 @@ class CeilometerClient(ceilometerUrl : URL,
   httpClient.setRequestBufferSize(requestBufferSize)
   httpClient.setResponseBufferSize(responseBufferSize)
   httpClient.start()
+  val logger = LoggerFactory.getLogger(this.getClass)
 
 
   override def tryListMeters(q : Seq[Query]) : Option[Seq[Meter]] = {
@@ -83,7 +85,10 @@ class CeilometerClient(ceilometerUrl : URL,
             None
         }
         catch{
-          case t : Throwable => None
+          case t : Throwable => {
+            logger.error(t.getMessage + "\n" + t.getStackTrace.mkString("\n"))
+            None
+          }
         }
       }
       case _ => None
@@ -115,7 +120,10 @@ class CeilometerClient(ceilometerUrl : URL,
       }
     }
     catch{
-      case _ : Throwable => None
+      case t : Throwable => {
+        logger.error(t.getMessage + "\n" + t.getStackTrace.mkString("\n"))
+        None
+      }
     }
   }
 
@@ -146,13 +154,16 @@ class CeilometerClient(ceilometerUrl : URL,
             }
             else None
           }
-          case _ => None
+          case _ =>{
+            logger.error("cannot get Token")
+            None
+          }
         }
       }
     }
     catch{
       case t : Throwable => {
-        println(t.getMessage)
+        logger.error(t.getMessage + "\n" + t.getStackTrace.mkString("\n"))
         None
       }
     }
@@ -185,12 +196,18 @@ class CeilometerClient(ceilometerUrl : URL,
             }
             else None
           }
-          case _ => None
+          case _ =>{
+            logger.error("cannot get Token")
+            None
+          }
         }
       }
     }
     catch{
-      case _ : Throwable => None
+      case t : Throwable => {
+        logger.error(t.getMessage + "\n" + t.getStackTrace.mkString("\n"))
+        None
+      }
     }
   }
 
@@ -223,12 +240,18 @@ class CeilometerClient(ceilometerUrl : URL,
             }
             else None
           }
-          case _ => None
+          case _ =>{
+            logger.error("cannot get token")
+            None
+          }
         }
       }
     }
     catch{
-      case _ : Throwable => None
+      case t : Throwable => {
+        logger.error(t.getMessage + "\n" + t.getStackTrace.mkString("\n"))
+        None
+      }
     }
   }
 
@@ -255,11 +278,17 @@ class CeilometerClient(ceilometerUrl : URL,
           }
           else None
         }
-        case _ => None
+        case _ => {
+          logger.error("cannot get Token")
+          None
+        }
       }
     }
     catch{
-      case _ : Throwable => None
+      case t : Throwable => {
+        logger.error(t.getMessage + "\n" + t.getStackTrace.mkString("\n"))
+        None
+      }
     }
   }
 
