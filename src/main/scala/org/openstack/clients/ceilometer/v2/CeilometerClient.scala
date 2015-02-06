@@ -176,7 +176,7 @@ class CeilometerClient(ceilometerUrl : URL,
         import org.openstack.api.restful.ceilometer.v2.FilterExpressions.SimpleQueryPackage.Goodies._
         val queries = List(("timestamp" >>>> from),("timestamp" <<== to))
         val request = MeterGETRequest(meterName, Some(queries), responseBufferSize/sample_size)
-        val uri = new URL(ceilometerUrl.toString + request.relativeURL).toURI
+        val uri = (ceilometerUrl / request.relativeURL).toURI
         tokenProvider.tokenOption match{
           case Some(s : String) => {
             val body = request.toJson.compactPrint
@@ -194,7 +194,10 @@ class CeilometerClient(ceilometerUrl : URL,
               import spray.json.DefaultJsonProtocol._
               json.get.tryConvertTo[List[OldSample]]
             }
-            else None
+            else {
+              logger.error("can't parse: " + exchange.getResponseContent)
+              None
+            }
           }
           case _ =>{
             logger.error("cannot get Token")
@@ -220,7 +223,7 @@ class CeilometerClient(ceilometerUrl : URL,
         import org.openstack.api.restful.ceilometer.v2.FilterExpressions.SimpleQueryPackage.Goodies._
         val queries = List(("timestamp" >>>> from),("timestamp" <<== to),("resource_id" ==== resource_id))
         val request = SamplesGETRequest(Some(queries), responseBufferSize / sample_size)
-        val uri = new URL(ceilometerUrl.toString + request.relativeURL).toURI
+        val uri = (ceilometerUrl / request.relativeURL).toURI
         tokenProvider.tokenOption match{
           case Some(s : String) => {
             val body = request.toJson.compactPrint
@@ -238,7 +241,10 @@ class CeilometerClient(ceilometerUrl : URL,
               import spray.json.DefaultJsonProtocol._
               json.get.tryConvertTo[List[Sample]]
             }
-            else None
+            else{
+              logger.error("can't parse: " + exchange.getResponseContent)
+              None
+            }
           }
           case _ =>{
             logger.error("cannot get token")
@@ -273,10 +279,12 @@ class CeilometerClient(ceilometerUrl : URL,
           val json = exchange.getResponseContent.tryParseJson
           if (json.isDefined) {
             import spray.json.DefaultJsonProtocol._
-            json.get.convertTo[List[Resource]]
             json.get.tryConvertTo[List[Resource]]
           }
-          else None
+          else {
+            logger.error("can't parse: "+exchange.getResponseContent)
+            None
+          }
         }
         case _ => {
           logger.error("cannot get Token")
