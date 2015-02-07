@@ -265,14 +265,17 @@ class CeilometerClient(ceilometerUrl : URL,
 
   override def tryListResources(queries : Seq[Query]) : Option[Seq[Resource]] = {
     try{
-      val req = ResourcesListGETRequest(queries)
-      val uri = new URL(ceilometerUrl.toString + req.relativeURL).toURI
       tokenProvider.tokenOption match{
         case Some(s : String) => {
+          val req = ResourcesListGETRequest(queries)
+          val jsonReq = req.toJson
+          val uri = (ceilometerUrl / req.relativeURL).toURI
           val exchange = new ContentExchange()
           exchange.setURI(uri)
           exchange.setMethod("GET")
           exchange.setRequestHeader("X-Auth-Token",s)
+          if (!jsonReq.asJsObject.fields.isEmpty)
+            exchange.setRequestContent(new ByteArrayBuffer(jsonReq.compactPrint.getBytes))
           exchange.setTimeout(readTimeout)
           httpClient.send(exchange)
           val state = exchange.waitForDone()
