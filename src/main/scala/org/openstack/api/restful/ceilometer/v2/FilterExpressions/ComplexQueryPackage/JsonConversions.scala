@@ -7,7 +7,19 @@ import org.openstack.api.restful.MalformedJsonException
 import spray.json.{DefaultJsonProtocol, JsObject, JsonWriter, _}
 
 /**
- * Json conversions
+ * spray json conversion for all the classes of this package (not subpackages)<br/>
+ * the list is:
+ *<ul>
+ * <li>[[org.openstack.api.restful.ceilometer.v2.FilterExpressions.ComplexQueryPackage.Order Order]]</li>
+ * <li>[[org.openstack.api.restful.ceilometer.v2.FilterExpressions.ComplexQueryPackage.OrderBy OrderBy]]</li>
+ * <li>[[org.openstack.api.restful.ceilometer.v2.FilterExpressions.ComplexQueryPackage.Filter Filter]]</li>
+ * <li>[[org.openstack.api.restful.ceilometer.v2.FilterExpressions.ComplexQueryPackage.ComplexQuery ComplexQuery]]</li>
+ * <li>[[org.openstack.api.restful.ceilometer.v2.FilterExpressions.ComplexQueryPackage.Expression Expression]]</li>
+ * <li>[[org.openstack.api.restful.ceilometer.v2.FilterExpressions.ComplexQueryPackage.MultiComplexExpression MultiComplexExpression]]</li>
+ * <li>[[org.openstack.api.restful.ceilometer.v2.FilterExpressions.ComplexQueryPackage.SimpleExpression SimpleExpression]]</li>
+ * <li>[[org.openstack.api.restful.ceilometer.v2.FilterExpressions.ComplexQueryPackage.SimpleInExpression SimpleInExpression]]</li>
+ * <li>[[org.openstack.api.restful.ceilometer.v2.FilterExpressions.ComplexQueryPackage.UnaryComplexExpression UnaryComplexExpression]]</li>
+ *</ul>
  * @author Antonio Murgia
  * @version 18/10/14
  */

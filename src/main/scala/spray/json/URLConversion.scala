@@ -5,7 +5,9 @@ import java.net.URL
 import org.openstack.api.restful.MalformedJsonException
 
 /**
- * Created by tmnd91 on 09/01/15.
+ * @author Antonio Murgia
+ * @version 09/01/15
+ * spray json conversion for java.net.URL
  */
 object URLConversion extends DefaultJsonProtocol{
   implicit object urljsonformat extends RootJsonFormat[java.net.URL]{

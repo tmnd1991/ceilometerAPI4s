@@ -3,7 +3,29 @@ package org.openstack.api.restful.ceilometer.v2.elements
 
 
 /**
- * json conversions
+ *
+ * spray json conversion for all the classes of this package (not subpackages)<br/>
+ * the list is:
+ *<ul>
+ * <li>[[org.openstack.api.restful.ceilometer.v2.elements.MeterType MeterType]]</li>
+ * <li>[[org.openstack.api.restful.ceilometer.v2.elements.Resource Resource]]</li>
+ * <li>[[org.openstack.api.restful.ceilometer.v2.elements.Meter Meter]]</li>
+ * <li>[[org.openstack.api.restful.ceilometer.v2.elements.Sample Sample]]</li>
+ * <li>[[org.openstack.api.restful.ceilometer.v2.elements.OldSample OldSample]]</li>
+ * <li>[[org.openstack.api.restful.ceilometer.v2.elements.Aggregate Aggregate]]</li>
+ * <li>[[org.openstack.api.restful.ceilometer.v2.elements.Statistics Statistics]]</li>
+ * <li>[[org.openstack.api.restful.ceilometer.v2.elements.AlarmState AlarmState]]</li>
+ * <li>[[org.openstack.api.restful.ceilometer.v2.elements.StatisticType StatisticType]]</li>
+ * <li>[[org.openstack.api.restful.ceilometer.v2.elements.AlarmCombinationRule AlarmCombinationRule]]</li>
+ * <li>[[org.openstack.api.restful.ceilometer.v2.elements.AlarmTimeConstraint AlarmTimeConstraint]]</li>
+ * <li>[[org.openstack.api.restful.ceilometer.v2.elements.AlarmThresholdRule AlarmThresholdRule]]</li>
+ * <li>[[org.openstack.api.restful.ceilometer.v2.elements.AlarmType AlarmType]]</li>
+ * <li>[[org.openstack.api.restful.ceilometer.v2.elements.Alarm Alarm]]</li>
+ * <li>[[org.openstack.api.restful.ceilometer.v2.elements.AlarmChangeType AlarmChangeType]]</li>
+ * <li>[[org.openstack.api.restful.ceilometer.v2.elements.AlarmChange AlarmChange]]</li>
+ * <li>java.sql.Timestamp</li>
+ *</ul>
+ *
  * @author Antonio Murgia
  * @version 22/10/14
  */

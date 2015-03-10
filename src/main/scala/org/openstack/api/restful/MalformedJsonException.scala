@@ -1,6 +1,5 @@
 package org.openstack.api.restful
 
-import java.text.ParseException
 
 /**
  * Exception that's thrown when the json syntax is malformed

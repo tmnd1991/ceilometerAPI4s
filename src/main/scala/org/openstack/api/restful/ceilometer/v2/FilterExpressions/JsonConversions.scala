@@ -9,7 +9,17 @@ import org.openstack.api.restful.MalformedJsonException
 import spray.json._
 
 /**
- * json conversions
+ * spray json conversion for all the classes of this package (not subpackages)<br/>
+ * the list is:
+ *<ul>
+ * <li>[[org.openstack.api.restful.ceilometer.v2.FilterExpressions.Query Query]]</li>
+ * <li>[[org.openstack.api.restful.ceilometer.v2.FilterExpressions.FieldValue FieldValue]]</li>
+ * <li>[[org.openstack.api.restful.ceilometer.v2.FilterExpressions.BooleanField BooleanField]]</li>
+ * <li>[[org.openstack.api.restful.ceilometer.v2.FilterExpressions.StringField StringField]]</li>
+ * <li>[[org.openstack.api.restful.ceilometer.v2.FilterExpressions.IntField IntField]]</li>
+ * <li>[[org.openstack.api.restful.ceilometer.v2.FilterExpressions.FloatField FloatField]]</li>
+ * <li>[[org.openstack.api.restful.ceilometer.v2.FilterExpressions.DateField DateField]]</li>
+ *</ul>
  * @author Antonio Murgia
  * @version 21/10/14
  */
