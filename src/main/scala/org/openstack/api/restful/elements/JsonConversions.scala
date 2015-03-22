@@ -7,6 +7,14 @@ import it.unibo.ing.utils.DateUtils
 import spray.json.URLConversion._
 import org.openstack.api.restful.MalformedJsonException
 /**
+ *
+ * spray json conversion for all the classes of this package (not subpackages)<br/>
+ * the list is:
+ *<ul>
+ * <li>[[org.openstack.api.restful.elements.Link Link]]</li>
+ * <li>[[org.openstack.api.restful.elements.Version Version]]</li>
+ * <li>java.util.Date</li>
+ *</ul>
  * @author Antonio Murgia
  * @version 11/10/14
  */

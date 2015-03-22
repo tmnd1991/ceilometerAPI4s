@@ -8,7 +8,12 @@ import java.util.Date
 import spray.json._
 
 /**
- * json conversions
+ * spray json conversion for all the classes of this package (not subpackages)<br/>
+ * the list is:
+ *<ul>
+ * <li>[[org.openstack.api.restful.ceilometer.v2.FilterExpressions.SimpleQueryPackage.Operator Operator]]</li>
+ * <li>[[org.openstack.api.restful.ceilometer.v2.FilterExpressions.SimpleQueryPackage.SimpleQuery SimpleQuery]]</li>
+ *</ul>
  * @author Antonio Murgia
  * @version 20/10/14
  */

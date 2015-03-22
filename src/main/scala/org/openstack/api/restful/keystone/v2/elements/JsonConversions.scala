@@ -12,9 +12,25 @@ import org.openstack.api.restful.keystone.v2.elements._
 
 
 /**
- * @author Antonio Murgia
- * @version 09/11/14.
- */
+  * spray json conversion for all the classes of this package (not subpackages)<br/>
+  * the list is:
+  *<ul>
+  *<li>[[org.openstack.api.restful.keystone.v2.elements.PasswordCredential PasswordCredential]]</li>
+  *<li>[[org.openstack.api.restful.keystone.v2.elements.OpenStackCredential OpenStackCredential]]</li>
+  *<li>[[org.openstack.api.restful.keystone.v2.elements.OpenStackTokenMetadata OpenStackTokenMetadata]]</li>
+  *<li>[[org.openstack.api.restful.keystone.v2.elements.OpenStackRole OpenStackRole]]</li>
+  *<li>[[org.openstack.api.restful.keystone.v2.elements.OpenStackUser OpenStackUser]]</li>
+  *<li>[[org.openstack.api.restful.keystone.v2.elements.OpenStackEndpoint OpenStackEndpoint]]</li>
+  *<li>[[org.openstack.api.restful.keystone.v2.elements.OpenStackEndpointType OpenStackEndpointType]]</li>
+  *<li>[[org.openstack.api.restful.keystone.v2.elements.OpenStackService OpenStackService]]</li>
+  *<li>[[org.openstack.api.restful.keystone.v2.elements.OpenStackTenant OpenStackTenant]]</li>
+  *<li>[[org.openstack.api.restful.keystone.v2.elements.OpenStackToken OpenStackToken]]</li>
+  *<li>[[org.openstack.api.restful.keystone.v2.elements.OpenStackAccess OpenStackAccess]]</li>
+  *<li>java.util.Date</li>
+ * <li>java.sql.Timestamp</li>
+  *</ul>
+  * @author Antonio Murgia
+  * @version 09/11/14*/
 object JsonConversions extends DefaultJsonProtocol{
   //REQUEST
   implicit val PasswordCredentialJsonFormat = jsonFormat2(PasswordCredential)
