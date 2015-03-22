@@ -57,11 +57,16 @@ trait ICeilometerClient {
   def tryGetSamplesOfResource(resource_id : String, from : Date, to :Date) : Option[Seq[Sample]]
 
   /**
+   * @param queries to be issued
+   * @param resource_id the id of the Resource the Samples are relative to.
+   * @return Some Samples about that meter from a Date to another or None if an error occurs
+   */
+  def tryGetSamplesOfResource(resource_id : String, queries : Query*) : Option[Seq[Sample]]
+
+  /**
    * called to shutdown the httpClient
    */
   def shutdown()
-
-  def timeOffset : Long
 
   //region syntactic sugar
   /**

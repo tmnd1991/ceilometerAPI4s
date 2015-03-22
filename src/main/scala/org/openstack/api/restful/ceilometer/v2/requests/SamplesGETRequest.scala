@@ -5,7 +5,7 @@ import org.openstack.api.restful.ceilometer.v2.FilterExpressions.Query
 /**
  * Created by tmnd91 on 07/01/15.
  */
-case class SamplesGETRequest(q : Option[List[Query]], limit : Int = 0) {
+case class SamplesGETRequest(q : Option[Seq[Query]], limit : Int = 0) {
   def relativeURL = "/v2/samples/"
 }
 object SamplesGETRequestJsonConversion extends spray.json.DefaultJsonProtocol{

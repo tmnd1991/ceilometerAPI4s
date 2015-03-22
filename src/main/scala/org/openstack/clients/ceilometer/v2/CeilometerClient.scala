@@ -216,52 +216,14 @@ class CeilometerClient(ceilometerUrl : URL,
 
 
   override def tryGetSamplesOfResource(resource_id : String, from : Date, to :Date) : Option[Seq[Sample]] = {
-    try{
-      if (to before from) None
-      else{
-        import org.openstack.api.restful.ceilometer.v2.requests.SamplesGETRequestJsonConversion._
-        import org.openstack.api.restful.ceilometer.v2.FilterExpressions.SimpleQueryPackage.Goodies._
-        val queries = List(("timestamp" >>>> from),("timestamp" <<== to),("resource_id" ==== resource_id))
-        val request = SamplesGETRequest(Some(queries), responseBufferSize / sample_size)
-        val uri = (ceilometerUrl / request.relativeURL).toURI
-        tokenProvider.tokenOption match{
-          case Some(s : String) => {
-            val body = request.toJson.compactPrint
-            val exchange = new ContentExchange()
-            exchange.setURI(uri)
-            exchange.setMethod("GET")
-            exchange.setRequestHeader("X-Auth-Token",s)
-            exchange.setRequestContentType("application/json")
-            exchange.setRequestContent(new ByteArrayBuffer(body.getBytes))
-            exchange.setTimeout(readTimeout)
-            httpClient.send(exchange)
-            val state = exchange.waitForDone()
-            val json = exchange.getResponseContent.tryParseJson
-            if (json.isDefined) {
-              import spray.json.DefaultJsonProtocol._
-              json.get.tryConvertTo[List[Sample]]
-            }
-            else{
-              logger.error("can't parse: " + exchange.getResponseContent)
-              None
-            }
-          }
-          case _ =>{
-            logger.error("cannot get token")
-            None
-          }
-        }
-      }
-    }
-    catch{
-      case t : Throwable => {
-        logger.error(t.getMessage + "\n" + t.getStackTrace.mkString("\n"))
-        None
-      }
+    import org.openstack.api.restful.ceilometer.v2.FilterExpressions.SimpleQueryPackage.Goodies._
+    if (to before from) None
+    else{
+      tryGetSamplesOfResource(resource_id,("timestamp" >>>> from), ("timestamp" <<== to))
     }
   }
 
-  override def timeOffset = tokenProvider.timeOffset
+  //override def timeOffset = tokenProvider.timeOffset
 
   override def tryListResources(queries : Seq[Query]) : Option[Seq[Resource]] = {
     try{
@@ -306,6 +268,53 @@ class CeilometerClient(ceilometerUrl : URL,
   override def shutdown() = {
     if (httpClient.isStarted)
       httpClient.stop()
+  }
+
+  /**
+   * @param queries to be issued
+   * @param resource_id the resource to be monitored
+   * @return Some Samples about that meter from a Date to another or None if an error occurs
+   */
+  override def tryGetSamplesOfResource(resource_id: String, queries: Query*): Option[Seq[Sample]] = {
+    try{
+      import org.openstack.api.restful.ceilometer.v2.requests.SamplesGETRequestJsonConversion._
+      import org.openstack.api.restful.ceilometer.v2.FilterExpressions.SimpleQueryPackage.Goodies._
+      val request = SamplesGETRequest(Some(queries :+ ("resource_id" ==== resource_id)), responseBufferSize / sample_size)
+      val uri = (ceilometerUrl / request.relativeURL).toURI
+      tokenProvider.tokenOption match{
+        case Some(s : String) => {
+          val body = request.toJson.compactPrint
+          val exchange = new ContentExchange()
+          exchange.setURI(uri)
+          exchange.setMethod("GET")
+          exchange.setRequestHeader("X-Auth-Token",s)
+          exchange.setRequestContentType("application/json")
+          exchange.setRequestContent(new ByteArrayBuffer(body.getBytes))
+          exchange.setTimeout(readTimeout)
+          httpClient.send(exchange)
+          val state = exchange.waitForDone()
+          val json = exchange.getResponseContent.tryParseJson
+          if (json.isDefined) {
+            import spray.json.DefaultJsonProtocol._
+            json.get.tryConvertTo[List[Sample]]
+          }
+          else{
+            logger.error("can't parse: " + exchange.getResponseContent)
+            None
+          }
+        }
+        case _ =>{
+          logger.error("cannot get token")
+          None
+        }
+      }
+    }
+    catch{
+      case t : Throwable => {
+        logger.error(t.getMessage + "\n" + t.getStackTrace.mkString("\n"))
+        None
+      }
+    }
   }
 }
 
