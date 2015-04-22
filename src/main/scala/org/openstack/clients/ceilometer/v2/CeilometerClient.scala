@@ -296,19 +296,9 @@ class CeilometerClient(ceilometerUrl : URL,
           exchange.setTimeout(readTimeout)
           httpClient.send(exchange)
           val state = exchange.waitForDone()
-          val json = exchange.getResponseContent.tryParseJson
-          if (json.isDefined) {
-            import spray.json.DefaultJsonProtocol._
-            //println(json.get.prettyPrint)
-            Some (json.get.convertTo[List[Sample]])
-
-
-          }
-          else{
-            println("can't parse: " + exchange.getResponseContent)
-            logger.error("can't parse: " + exchange.getResponseContent)
-            None
-          }
+          val json = exchange.getResponseContent.parseJson
+          import spray.json.DefaultJsonProtocol._
+          Some (json.convertTo[List[Sample]])
         }
         case _ =>{
           println("cannot get token")
