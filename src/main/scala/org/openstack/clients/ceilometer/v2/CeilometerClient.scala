@@ -323,7 +323,7 @@ class CeilometerClient(ceilometerUrl : URL,
  */
 object CeilometerClient{
   private val instances : scala.collection.mutable.Map[Int,CeilometerClient] = scala.collection.mutable.Map()
-  def getInstance(ceilometerUrl : URL, keystoneUrl : URL, tenantName : String,  username : String, password : String, connectTimeout : Int = 10000, readTimeout : Int = 10000) = {
+  def getInstance(ceilometerUrl : URL, keystoneUrl : URL, tenantName : String,  username : String, password : String, connectTimeout: Int, readTimeout: Int) = {
     this.synchronized{
       val hashcode = getHashCode(ceilometerUrl,keystoneUrl,tenantName,username,password)
       if (!instances.contains(hashCode))
