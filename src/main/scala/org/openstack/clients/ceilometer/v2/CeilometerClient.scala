@@ -311,7 +311,7 @@ class CeilometerClient(ceilometerUrl : URL,
     }
     catch{
       case t : Throwable => {
-        logger.error(t.getMessage + "\n" + t.getStackTrace.mkString("\n"))
+        logger.error(t.getMessage,t)
         None
       }
     }
