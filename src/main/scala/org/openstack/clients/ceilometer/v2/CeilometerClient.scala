@@ -247,22 +247,19 @@ class CeilometerClient(ceilometerUrl : URL,
             json.get.tryConvertTo[List[Resource]]
           }
           else {
-            println("can't parse: "+exchange.getResponseContent)
             logger.error("can't parse: "+exchange.getResponseContent)
             None
           }
         }
         case _ => {
           logger.error("cannot get Token")
-          println("cannot get Token")
           None
         }
       }
     }
     catch{
       case t : Throwable => {
-        logger.error(t.getMessage + "\n" + t.getStackTrace.mkString("\n"))
-        println(t.getMessage + "\n" + t.getStackTrace.mkString("\n"))
+        logger.error(t.getMessage, t)
         None
       }
     }
@@ -296,12 +293,12 @@ class CeilometerClient(ceilometerUrl : URL,
           exchange.setTimeout(readTimeout)
           httpClient.send(exchange)
           val state = exchange.waitForDone()
-          val json = exchange.getResponseContent.parseJson
+          val jsonText = exchange.getResponseContent
+          val json = jsonText.parseJson
           import spray.json.DefaultJsonProtocol._
-          Some (json.convertTo[List[Sample]])
+          Some(json.convertTo[List[Sample]])
         }
         case _ =>{
-          println("cannot get token")
           logger.error("cannot get token")
           None
         }
@@ -309,7 +306,6 @@ class CeilometerClient(ceilometerUrl : URL,
     }
     catch{
       case t : Throwable => {
-        println(t.getMessage + t)
         logger.error(t.getMessage,t)
         None
       }
