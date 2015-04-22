@@ -10,14 +10,14 @@ import java.util.Date
 case class Sample(id : String,
                   metadata : Map[String,String],
                   meter : String,
-                  project_id : String,
+                  project_id : Option[String],
                   recorded_at : java.sql.Timestamp,
                   resource_id: String,
                   source : String,
                   timestamp : java.sql.Timestamp,
                   `type` : MeterType,
                   unit : String,
-                  user_id : String,
+                  user_id : Option[String],
                   volume : Float)
 /*
 id
