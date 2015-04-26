@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit
 
 
 import org.eclipse.jetty.io.ByteArrayBuffer
-import org.eclipse.jetty.util.thread.QueuedThreadPool
+import org.eclipse.jetty.util.thread.{ExecutorThreadPool, QueuedThreadPool}
 import org.slf4j.{LoggerFactory, Logger}
 import spray.json._
 import spray.json.MyMod._
@@ -51,14 +51,9 @@ class CeilometerClient(ceilometerUrl : URL,
   private val requestBufferSize = 16384
   private val tokenProvider = KeystoneTokenProvider.getInstance(keystoneUrl, tenantName, username, password)
   private val httpClient = new HttpClient()
-  private val threadPool = new QueuedThreadPool()
-  threadPool.setMaxThreads(256)
-  threadPool.setMaxQueued(256)
-  threadPool.setMaxIdleTimeMs((readTimeout*1.2).toInt)
-  threadPool.setMaxStopTimeMs((readTimeout*1.2).toInt)
-  threadPool.setName("HttpClient")
+  private val tPool = new ExecutorThreadPool(256)
   httpClient.setConnectTimeout(connectTimeout)
-  httpClient.setThreadPool(threadPool)
+  httpClient.setThreadPool(tPool)
   httpClient.setMaxRedirects(1)
   httpClient.setRequestBufferSize(requestBufferSize)
   httpClient.setResponseBufferSize(responseBufferSize)
