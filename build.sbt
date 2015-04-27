@@ -1,6 +1,6 @@
 name := "ceilometerAPI4s"
 
-version := "0.7"
+version := "0.8"
 
 organization := "it.unibo.ing.smacs"
 
@@ -18,3 +18,5 @@ libraryDependencies += "org.slf4j" % "slf4j-api" % "1.7.5"
 
 //SOME UTILS
 libraryDependencies += "it.unibo.ing" %% "utils" % "1.0" withSources() intransitive()
+
+libraryDependencies += "net.databinder.dispatch" %% "dispatch-core" % "0.11.2"

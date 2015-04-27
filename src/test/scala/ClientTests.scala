@@ -6,11 +6,13 @@ import it.unibo.ing.utils._
 import org.openstack.api.restful.ceilometer.v2.FilterExpressions.SimpleQueryPackage.Goodies._
 import org.openstack.api.restful.ceilometer.v2.FilterExpressions.FieldValue._
 import org.openstack.api.restful.ceilometer.v2.elements.{Resource, Meter}
+import org.openstack.clients.ceilometer.v2.ICeilometerClient2
 import org.scalatest._
 
 import scala.collection.IterableLike
 import scala.collection.generic.CanBuildFrom
-
+import scala.concurrent.Await
+import scala.concurrent.duration._
 /**
  * Created by tmnd on 26/11/14.
  */
@@ -22,28 +24,26 @@ class ClientTests extends FlatSpec with Matchers{
   val username = "amurgia"
   val password = "PUs3dAs?"
 
-  lazy val client = org.openstack.clients.ceilometer.v2.CeilometerClient.getInstance(ceilometerURL, keystoneURL, tenantName, username, password,30000, 360000)
-  lazy val meters = client.tryListAllMeters
-  lazy val resources = client.tryListAllResources
+  lazy val client: ICeilometerClient2 = org.openstack.clients.ceilometer.v2.CeilometerClient.getInstance(ceilometerURL, keystoneURL, tenantName, username, password,30000, 360000)
+  lazy val meters = Await.result(client.listMeters(Seq()),3000000.millis)
+  lazy val resources = Await.result(client.listResources(Seq()),300000.millis)
   "there " should " be some meters " in {
-    meters should not be None
-    meters.get.isEmpty should be (false)
-    println(s"there are ${meters.get.size} meters")
+    meters.isEmpty should be (false)
+    println(s"there are ${meters.size} meters")
   }
 
   "there " should " be some statistics about meters in the last 1 hour" in {
-    val theMeter = meters.get.head.name
+    val theMeter = meters.head.name
     val startDate = new Date(new Date().getTime - 3600000)
     val endDate = new Date()
-    val stats = client.tryGetStatistics(theMeter, startDate, endDate)
-    stats should not be None
-    stats.get.isEmpty should be (false)
+    val stats = Await.result(client.getStatistics(theMeter, startDate, endDate),3000000.millis)
+    stats.isEmpty should be (false)
   }
 
   "there " should " be some resources " in {
     resources should not be None
-    resources.get.isEmpty should be (false)
-    println(s"there are ${resources.get.size} resources")
+    resources.isEmpty should be (false)
+    println(s"there are ${resources.size} resources")
   }
 
   "there " should " be some samples about resources in the last 1 hour" in {
@@ -51,13 +51,13 @@ class ClientTests extends FlatSpec with Matchers{
     val end = new Date(start.getTime + 3600000)
     println("start " + start)
     println("end " + end)
-    val samples1 = client.tryGetSamplesOfResource(resources.get.head.resource_id, start, end)
-    val samples2 = client.tryGetSamplesOfMeter(meters.get.head.name, start, end)
+    val samples1 = Await.result(client.getSamplesOfResource(resources.head.resource_id, start, end),300000.millis)
+    val samples2 = Await.result(client.getSamplesOfMeter(meters.head.name, start, end),300000.millis)
     samples1 should not be None
-    samples1.get.isEmpty should be (false)
+    samples1.isEmpty should be (false)
     samples2 should not be None
-    samples2.get.isEmpty should be (false)
-    for (s <- samples1.get.distinctBy(_.meter))
+    samples2.isEmpty should be (false)
+    for (s <- samples1.distinctBy(_.meter))
       println(s.meter)
     /*
     println(s"there are ${samples1.get.size} samples")
