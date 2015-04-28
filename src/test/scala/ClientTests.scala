@@ -6,7 +6,7 @@ import it.unibo.ing.utils._
 import org.openstack.api.restful.ceilometer.v2.FilterExpressions.SimpleQueryPackage.Goodies._
 import org.openstack.api.restful.ceilometer.v2.FilterExpressions.FieldValue._
 import org.openstack.api.restful.ceilometer.v2.elements.{Resource, Meter}
-import org.openstack.clients.ceilometer.v2.ICeilometerClient2
+import org.openstack.clients.ceilometer.v2.ICeilometerClient
 import org.scalatest._
 
 import scala.collection.IterableLike
@@ -24,9 +24,9 @@ class ClientTests extends FlatSpec with Matchers{
   val username = "amurgia"
   val password = "PUs3dAs?"
 
-  lazy val client: ICeilometerClient2 = org.openstack.clients.ceilometer.v2.CeilometerClient.getInstance(ceilometerURL, keystoneURL, tenantName, username, password,30000, 360000)
-  lazy val meters = Await.result(client.listMeters(Seq()),3000000.millis)
-  lazy val resources = Await.result(client.listResources(Seq()),300000.millis)
+  lazy val client: ICeilometerClient = org.openstack.clients.ceilometer.v2.CeilometerClient.getInstance(ceilometerURL, keystoneURL, tenantName, username, password,30000, 360000)
+  lazy val meters = client.listAllMeters
+  lazy val resources = client.listAllResources
   "there " should " be some meters " in {
     meters.isEmpty should be (false)
     println(s"there are ${meters.size} meters")
@@ -36,7 +36,7 @@ class ClientTests extends FlatSpec with Matchers{
     val theMeter = meters.head.name
     val startDate = new Date(new Date().getTime - 3600000)
     val endDate = new Date()
-    val stats = Await.result(client.getStatistics(theMeter, startDate, endDate),3000000.millis)
+    val stats = client.getStatistics(theMeter, startDate, endDate)
     stats.isEmpty should be (false)
   }
 
@@ -51,8 +51,8 @@ class ClientTests extends FlatSpec with Matchers{
     val end = new Date(start.getTime + 3600000)
     println("start " + start)
     println("end " + end)
-    val samples1 = Await.result(client.getSamplesOfResource(resources.head.resource_id, start, end),300000.millis)
-    val samples2 = Await.result(client.getSamplesOfMeter(meters.head.name, start, end),300000.millis)
+    val samples1 = client.getSamplesOfResource(resources.head.resource_id, start, end)
+    val samples2 = client.getSamplesOfMeter(meters.head.name, start, end)
     samples1 should not be None
     samples1.isEmpty should be (false)
     samples2 should not be None

@@ -1,12 +1,12 @@
 name := "ceilometerAPI4s"
 
-version := "0.8"
+version := "1.0"
 
 organization := "it.unibo.ing.smacs"
 
 scalacOptions += "-feature"
 
-scalaVersion := "2.11.2"
+scalaVersion := "2.11.4"
 
 libraryDependencies += "io.spray" %%  "spray-json" % "1.3.1" withSources()
 
@@ -18,5 +18,3 @@ libraryDependencies += "org.slf4j" % "slf4j-api" % "1.7.5"
 
 //SOME UTILS
 libraryDependencies += "it.unibo.ing" %% "utils" % "1.0" withSources() intransitive()
-
-libraryDependencies += "net.databinder.dispatch" %% "dispatch-core" % "0.11.2"
